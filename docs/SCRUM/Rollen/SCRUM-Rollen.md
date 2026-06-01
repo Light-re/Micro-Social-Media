@@ -8,9 +8,10 @@ In diesem Schulprojekt werden die Scrum-Rollen klar auf die Teammitglieder verte
 
 Aufgaben:
 - Anforderungen und User Stories festlegen
-- Product Backlog priorisieren
+- Product Backlog priorisieren und aktuell halten
 - MVP-Umfang bestimmen
-- Entscheiden, welche Features umgesetzt oder weggelassen werden
+- GitHub Issues für User Stories vorbereiten
+- Entscheiden, welche Features umgesetzt oder bewusst weggelassen werden
 - Abnahme der fertigen Funktionen anhand der Akzeptanzkriterien
 
 ## Scrum Master
@@ -19,27 +20,34 @@ Aufgaben:
 
 Aufgaben:
 - Scrum-Prozess einhalten
-- Sprint-Planung organisieren
+- Sprint Planning, Standup, Review und Retrospektive moderieren
 - Hindernisse dokumentieren und lösen
-- Darauf achten, dass regelmässig reflektiert wird
-- Sprint Review und Retrospektive vorbereiten
+- GitHub Project Board pflegen
+- Pull Requests prüfen und Reviews koordinieren
+- Milestones nach jedem Sprint schliessen und neue erstellen
 
 ## Developers
 
 **Verantwortlich:** Alen Arandjelovic und Dylan Kolb
 
 Aufgaben:
-- Flutter-App mit Dart entwickeln
-- Flutter-App lokal auf Emulator oder Handy testen
-- Spring Boot Backend entwickeln
-- PostgreSQL als SQL-Datenbank anbinden
-- MongoDB als NoSQL-Datenbank anbinden
-- Docker Compose Setup für Backend, PostgreSQL und MongoDB erstellen und pflegen
+- Android-App mit Java entwickeln
+- Spring Boot Backend mitentwickeln
 - REST API zwischen App und Backend umsetzen
-- User Stories technisch umsetzen
-- Funktionen testen
-- Fehler beheben
-- Dokumentation und Präsentation vorbereiten
+- MongoDB als NoSQL-Datenbank anbinden
+- Room Database als lokale SQL-Datenbank nutzen
+- Features gemäss User Stories umsetzen
+- Funktionen auf dem Emulator testen
+- Pull Requests erstellen und reviewen
+
+## Feature-Verantwortung
+
+| Person | Hauptfeature | Verantwortlich für |
+|---|---|---|
+| Noé Fratton | Auth + Scrum | Register, Login, JWT, Spring Security, GitHub-Pflege, Sprint-Moderation |
+| Ajan Neziri | Posts + Feed | Post-CRUD, Feed-Endpoint, Likes, Comments, Backlog pflegen |
+| Alen Arandjelovic | Follow + Chat | Follow/Unfollow, Realtime Chat, Profil-Page |
+| Dylan Kolb | Stories + Explore | Stories, Explore-Page, Push Notifications |
 
 ## Stakeholder
 
@@ -54,22 +62,24 @@ Aufgaben:
 
 ### Sprint Planning
 
-Zu Beginn jeder Woche wird geplant, welche User Stories im Sprint umgesetzt werden.
+Montag um 08:00 Uhr werden Backlog-Punkte geschätzt, das Sprint-Ziel definiert und Tasks verteilt.
 
-### Daily Scrum
+### Daily Standup
 
-Da es ein kleines Schulprojekt ist, wird kein tägliches Meeting benötigt. Stattdessen wird regelmässig kurz dokumentiert:
-- Was wurde gemacht?
-- Was ist als Nächstes geplant?
-- Gibt es Probleme?
+Im kleinen Schulprojekt wird das Standup wöchentlich am Montag durchgeführt und bei Bedarf async im Gruppenchat ergänzt.
+
+Fragen:
+- Was habe ich seit dem letzten Standup fertiggestellt?
+- Was werde ich bis zum nächsten Termin fertigstellen?
+- Was blockiert mich gerade?
 
 ### Sprint Review
 
-Am Ende jeder Woche wird geprüft, welche Funktionen fertig sind und ob sie zu den Akzeptanzkriterien passen.
+Am Montag um 16:30 Uhr wird gezeigt, was im Sprint fertig wurde.
 
 ### Sprint Retrospektive
 
-Am Ende jeder Woche wird kurz festgehalten:
+Nach dem Review wird kurz reflektiert:
 - Was lief gut?
 - Was war schwierig?
 - Was wird nächste Woche verbessert?
@@ -77,12 +87,11 @@ Am Ende jeder Woche wird kurz festgehalten:
 ## Definition of Done
 
 Eine User Story gilt als fertig, wenn:
-- die Funktion umgesetzt ist
-- die Akzeptanzkriterien erfüllt sind
-- die App ohne sichtbare Fehler läuft
-- Backend Endpoints funktionieren, falls die Story Backend-Logik braucht
-- Daten korrekt in PostgreSQL oder MongoDB gespeichert oder gelesen werden, falls nötig
-- Eingaben validiert werden, falls nötig
-- Ladezustände oder Fehlermeldungen vorhanden sind, falls nötig
-- die Funktion kurz getestet wurde
-- der Code verständlich und aufgeräumt ist
+- Code auf `develop` gemerged ist
+- keine Compile-Errors vorhanden sind
+- keine offensichtlichen Runtime-Crashes auftreten
+- die Funktion auf dem Emulator getestet wurde
+- mindestens ein Fehlerfall getestet wurde
+- ein anderes Teammitglied den Pull Request reviewed hat
+- die GitHub Issue geschlossen und im Board auf Done ist
+- keine API Keys oder Passwörter committed wurden

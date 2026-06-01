@@ -1,27 +1,39 @@
-# Dart / Flutter
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-.packages
+# Project handoff / private context
+FrattonInteractive_Sprint0_Handoff_v2.docx
+
+# Secrets / local config
+.env
+*.env
+application-secrets.properties
+pulse-backend/src/main/resources/application-secrets.properties
+pulse-android/app/google-services.json
+
+# Java / Maven / Spring Boot
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Android / Gradle
+.gradle/
 build/
+captures/
+local.properties
+*.apk
+*.ap_
+*.aab
 
-# Android / iOS generated files
-android/.gradle/
-android/local.properties
-ios/Flutter/Generated.xcconfig
-ios/Flutter/flutter_export_environment.sh
-
-# IDEs
+# Android Studio / IntelliJ
 .idea/
-.vscode/
 *.iml
+
+# Logs
+*.log
 
 # OS files
 .DS_Store
 Thumbs.db
 
-# Logs
-*.log
-
-# Firebase / local config
-firebase-debug.log
+# Docker local data
+mongo_data/

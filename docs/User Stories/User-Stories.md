@@ -11,7 +11,7 @@ Akzeptanzkriterien:
 
 ## 2. Registrierung Durchführen
 
-Als neuer User möchte ich mich mit E-Mail, Passwort und Benutzername registrieren, damit ich die App nutzen kann.
+Als neuer User möchte ich mich mit E-Mail, Passwort und Benutzername registrieren, damit ich Pulse nutzen kann.
 
 Akzeptanzkriterien:
 - Gegeben ich bin auf dem Register Screen

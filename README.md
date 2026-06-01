@@ -1,22 +1,23 @@
-# Mini Social Media App
+# Pulse
 
-Dieses Repository enthält ein Schulprojekt für das Modul 335 - Mobile-Applikation realisieren.
+Dieses Repository enthält das Schulprojekt **Pulse** für das Modul 335 - Mobile-Applikation realisieren.
 
-Ziel ist eine einfache Social-Media-App als Handy-App. Die App wird mit Flutter und Dart entwickelt und läuft lokal auf einem Emulator oder einem echten Handy. Das Backend wird mit Spring Boot umgesetzt und über eine REST API mit der App verbunden.
-
-Backend, PostgreSQL und MongoDB werden mit Docker Compose gestartet. PostgreSQL wird als SQL-Datenbank verwendet, MongoDB als NoSQL-Datenbank.
+Pulse ist eine mobile Social-Media-App für Android. Die App wird als native Android-App mit Java entwickelt. Das Backend wird mit Spring Boot umgesetzt und stellt eine REST API bereit. Für die Datenhaltung werden bewusst SQL und NoSQL eingesetzt.
 
 ## Projektart
 
 - Modul: 335 - Mobile-Applikation realisieren
+- Schule: WISS St. Gallen
 - Vorgehensmodell: Scrum
 - Projektdauer: 5 Wochen
-- Mobile App: Flutter mit Dart
-- Backend: Spring Boot
-- SQL-Datenbank: PostgreSQL
+- App-Name: Pulse
+- Mobile App: Android Native mit Java
+- Backend: Spring Boot mit Maven
 - NoSQL-Datenbank: MongoDB
-- Containerisierung: Docker / Docker Compose
-- Kommunikation: REST API
+- SQL-Datenbank: Room Database / SQLite lokal auf dem Android-Gerät
+- API-Kommunikation: REST mit Retrofit und OkHttp
+- Authentifizierung: JWT
+- Containerisierung: Docker / Docker Compose für Backend-Services
 
 ## Geplante Hauptfunktionen
 
@@ -28,47 +29,36 @@ Backend, PostgreSQL und MongoDB werden mit Docker Compose gestartet. PostgreSQL 
 - Beiträge liken und unliken
 - Beiträge kommentieren
 - Eigene Beiträge löschen
+- Lokaler Cache mit Room
 - Validierung von Eingaben
 - Ladezustände und Fehlermeldungen
 
 ## Architektur
 
-Die geplante Architektur besteht aus einer lokal gestarteten Flutter Mobile App und containerisierten Backend-Services:
-
 ```text
-Flutter App lokal / Emulator
+Android App (Java)
         |
-        | REST API
+        | Retrofit / REST API
         v
-Docker Compose
+Spring Boot Backend
         |
-        +--> Spring Boot Backend
-        +--> PostgreSQL (SQL)
-        +--> MongoDB (NoSQL)
+        v
+MongoDB (NoSQL, Cloud oder lokal)
+
+Android App
+        |
+        v
+Room Database / SQLite (SQL, lokal)
 ```
 
-Die Flutter App wird nicht über Docker Compose gestartet, sondern lokal mit `flutter run`. Docker Compose startet das Spring Boot Backend, PostgreSQL und MongoDB.
+MongoDB wird für cloudbasierte Social-Media-Daten verwendet. Room wird lokal auf dem Android-Gerät für Cache, Bookmarks und Session-Daten verwendet.
 
-## Datenhaltung
+## Warum SQL und NoSQL?
 
-Die App verwendet bewusst zwei verschiedene Datenbanktypen:
+Der Lehrer fordert beide Datenbanktypen. Im Projekt werden sie sinnvoll getrennt:
 
-- PostgreSQL für strukturierte relationale Daten wie User, Profile und Likes
-- MongoDB für dokumentbasierte Social-Media-Inhalte wie Posts und Kommentare
-
-Diese Aufteilung zeigt den Einsatz von SQL und NoSQL in einem gemeinsamen Projekt.
-
-## Warum Dart?
-
-Dart ist die Programmiersprache von Flutter. Da das Projekt eine Handy-App ist, wird die mobile App mit Flutter/Dart umgesetzt.
-
-## Warum Spring Boot?
-
-Spring Boot wird für das Backend verwendet. Es stellt die REST API bereit, verarbeitet Login, Beiträge, Likes, Kommentare und Profile und verbindet sich mit PostgreSQL und MongoDB.
-
-## Warum Docker?
-
-Docker wird verwendet, damit Backend, SQL-Datenbank und NoSQL-Datenbank einfach und einheitlich gestartet werden können. Dadurch ist die Entwicklungsumgebung für das Team besser nachvollziehbar.
+- **MongoDB / NoSQL:** User, Profile, Posts, Likes, Kommentare und flexible Social-Media-Daten
+- **Room / SQL:** lokaler Cache, gespeicherte Posts und Session-Daten auf dem Gerät
 
 ## Dokumentation
 
@@ -80,7 +70,10 @@ Wichtige Dokumente:
 - `docs/SCRUM/Product-Backlog/Product-Backlog.md`
 - `docs/SCRUM/Rollen/SCRUM-Rollen.md`
 - `docs/SCRUM/Sprint-Planung/Sprint-Planung.md`
+- `docs/Architektur/Architektur.md`
+- `docs/Aufgaben/Ajan-Neziri.md`
+- `docs/GitHub/GitHub-Issues.md`
 
 ## MVP
 
-Der Fokus liegt auf einer stabilen, einfachen und präsentierbaren App. Funktionen wie Reels, Storys, Live-Chat, private Nachrichten, Push Notifications, React Web-Frontend oder Firebase werden bewusst weggelassen.
+Der Fokus liegt auf einer stabilen, einfachen und präsentierbaren App. Reels, komplexe Story-Funktionen, Live-Chat, Push Notifications und grosse Zusatzfeatures werden nur umgesetzt, wenn nach dem MVP noch genügend Zeit bleibt.
