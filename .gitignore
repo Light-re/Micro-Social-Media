@@ -5,8 +5,9 @@ FrattonInteractive_Sprint0_Handoff_v2.docx
 .env
 *.env
 application-secrets.properties
-pulse-backend/src/main/resources/application-secrets.properties
-pulse-android/app/google-services.json
+**/application-secrets.properties
+google-services.json
+**/google-services.json
 
 # Java / Maven / Spring Boot
 target/
