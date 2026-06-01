@@ -7,7 +7,6 @@ Pulse ist eine mobile Social-Media-App für Android. Die App wird als native And
 ## Projektart
 
 - Modul: 335 - Mobile-Applikation realisieren
-- Schule: WISS St. Gallen
 - Vorgehensmodell: Scrum
 - Projektdauer: 5 Wochen
 - App-Name: Pulse
