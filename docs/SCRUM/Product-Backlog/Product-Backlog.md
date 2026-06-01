@@ -2,6 +2,8 @@
 
 Dieses Product Backlog basiert auf den User Stories der Mini Social Media App. Die Priorisierung orientiert sich am MVP für ein realistisches 5-Wochen-Schulprojekt.
 
+Die App wird als mobile App mit Flutter/Dart umgesetzt und lokal auf einem Emulator oder Handy gestartet. Das Backend wird mit Spring Boot entwickelt. PostgreSQL wird als SQL-Datenbank genutzt, MongoDB als NoSQL-Datenbank. Spring Boot, PostgreSQL und MongoDB werden mit Docker Compose gestartet.
+
 ## Prioritäten
 
 - Must-have: notwendig für eine präsentierbare MVP-Version
@@ -51,9 +53,33 @@ Dieses Product Backlog basiert auf den User Stories der Mini Social Media App. D
 | US-31 | Fehler verständlich anzeigen | Must-have | 3 | Sprint 2 | Offen |
 | US-32 | Netzwerkfehler anzeigen | Should-have | 2 | Sprint 5 | Offen |
 
+## Technische Backlog Items
+
+| ID | Aufgabe | Priorität | Sprint | Status |
+|---|---|---|---|---|
+| T-01 | Flutter-Projekt mit Dart erstellen | Must-have | Sprint 1 | Offen |
+| T-02 | Spring Boot Backend erstellen | Must-have | Sprint 1 | Offen |
+| T-03 | PostgreSQL als SQL-Datenbank vorbereiten | Must-have | Sprint 1 | Offen |
+| T-04 | MongoDB als NoSQL-Datenbank vorbereiten | Must-have | Sprint 1 | Offen |
+| T-05 | Docker Compose für Backend, PostgreSQL und MongoDB erstellen | Must-have | Sprint 1 | Offen |
+| T-06 | REST API Struktur definieren | Must-have | Sprint 1 | Offen |
+| T-07 | Auth-Endpunkte im Backend vorbereiten | Must-have | Sprint 2 | Offen |
+| T-08 | App mit Backend API verbinden | Must-have | Sprint 2 | Offen |
+| T-09 | Datenmodelle für User, Post, Comment und Like erstellen | Must-have | Sprint 2 | Offen |
+| T-10 | SQL/NoSQL-Aufteilung dokumentieren | Should-have | Sprint 2 | Offen |
+| T-11 | Fehlerbehandlung zwischen App und Backend standardisieren | Should-have | Sprint 3 | Offen |
+| T-12 | Docker Setup dokumentieren | Should-have | Sprint 5 | Offen |
+
 ## MVP-Umfang
 
 Für das MVP werden vor allem Registrierung, Login, Logout, Feed, Beiträge, Likes, Kommentare, Profil, Validierung, Ladezustände und verständliche Fehlermeldungen umgesetzt.
+
+Technisch gehören Flutter/Dart, Spring Boot, PostgreSQL, MongoDB und Docker Compose zum MVP, weil diese Architektur für das Projekt geplant ist.
+
+## Geplante Datenbank-Aufteilung
+
+- PostgreSQL: User, Profile, Login-relevante Daten und Likes
+- MongoDB: Posts und Kommentare
 
 ## Bewusst nicht im MVP
 
@@ -66,3 +92,6 @@ Für das MVP werden vor allem Registrierung, Login, Logout, Feed, Beiträge, Lik
 - Algorithmischer Feed
 - Hashtags und Trends
 - Video-Uploads
+- React Web-Frontend
+- Firebase als Backend
+- Flutter Frontend in Docker starten

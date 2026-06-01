@@ -2,11 +2,15 @@
 
 Das Projekt wird agil mit Scrum geplant. Da das Schulprojekt fünf Wochen dauert, wird jede Woche als ein Sprint betrachtet. Jeder Sprint hat ein klares Sprint-Ziel und ausgewählte User Stories aus dem Product Backlog.
 
-## Sprint 1: Planung, Setup und UI-Grundstruktur
+Die technische Zielarchitektur besteht aus einer Flutter App mit Dart, einem Spring Boot Backend, PostgreSQL als SQL-Datenbank, MongoDB als NoSQL-Datenbank und Docker Compose für Backend und Datenbanken.
+
+Wichtig: Die Flutter App läuft lokal auf einem Emulator oder einem echten Handy. Docker Compose startet nur Spring Boot Backend, PostgreSQL und MongoDB.
+
+## Sprint 1: Planung, Setup und Grundstruktur
 
 **Zeitraum:** Woche 1
 
-**Sprint-Ziel:** Die App ist geplant, die Grundstruktur steht und die wichtigsten Screens sind als UI-Gerüst vorhanden.
+**Sprint-Ziel:** Die App und das Backend sind geplant, die Projektstruktur steht und die wichtigsten Screens sind als UI-Gerüst vorhanden.
 
 Geplante User Stories:
 - US-01 Registrierung öffnen
@@ -18,23 +22,28 @@ Geplante User Stories:
 - Create Post Screen als UI erstellen
 - Comments Screen als UI erstellen
 
-Aufgaben:
+Technische Aufgaben:
 - Projektanforderungen klären
 - User Stories finalisieren
 - Product Backlog erstellen
-- Flutter-Projekt vorbereiten
-- Ordnerstruktur planen
-- Navigation zwischen Screens vorbereiten
-- Grunddesign festlegen
+- Flutter-Projekt mit Dart vorbereiten
+- Spring Boot Backend vorbereiten
+- PostgreSQL als SQL-Datenbank einplanen
+- MongoDB als NoSQL-Datenbank einplanen
+- Docker Compose für Backend, PostgreSQL und MongoDB vorbereiten
+- REST API grob planen
+- SQL/NoSQL-Aufteilung festlegen
+- Ordnerstruktur für App und Backend festlegen
+- Grunddesign der mobilen App festlegen
 
 Ergebnis:
-Eine klickbare App-Struktur ohne vollständige Firebase-Logik.
+Eine klickbare Flutter-App-Struktur und ein vorbereitetes Backend-Grundgerüst mit geplanter SQL/NoSQL-Datenhaltung.
 
-## Sprint 2: Authentifizierung
+## Sprint 2: Authentifizierung und User-Verwaltung
 
 **Zeitraum:** Woche 2
 
-**Sprint-Ziel:** User können sich registrieren, einloggen und ausloggen.
+**Sprint-Ziel:** User können sich über die mobile App registrieren, einloggen und ausloggen. Die App kommuniziert dafür mit dem Spring Boot Backend.
 
 Geplante User Stories:
 - US-02 Registrierung durchführen
@@ -48,17 +57,19 @@ Geplante User Stories:
 - US-28 Passwort validieren
 - US-31 Fehler verständlich anzeigen
 
-Aufgaben:
-- Firebase Authentication einrichten
-- Registrierung implementieren
-- Login implementieren
-- Logout implementieren
-- Auth-Status beim App-Start prüfen
-- Validierung für Login und Registrierung einbauen
-- Fehlermeldungen verständlich anzeigen
+Technische Aufgaben:
+- User-Modell im Backend erstellen
+- Auth Controller im Spring Boot Backend erstellen
+- Registrierung als REST Endpoint umsetzen
+- Login als REST Endpoint umsetzen
+- Passwort sicher behandeln
+- PostgreSQL Anbindung für User und Profile einrichten
+- Flutter App mit Auth API verbinden
+- Auth-Status in der App speichern
+- Validierung und Fehlermeldungen in der App einbauen
 
 Ergebnis:
-User können sich sicher anmelden und die App erkennt, ob ein User eingeloggt ist.
+User können sich über die App anmelden, und User-Daten werden über das Backend in PostgreSQL verarbeitet.
 
 ## Sprint 3: Beiträge und Feed
 
@@ -76,18 +87,18 @@ Geplante User Stories:
 - US-29 Ladezustand anzeigen
 - US-30 Buttons während Laden sperren
 
-Aufgaben:
-- Post-Datenmodell erstellen
-- Firestore-Struktur für Beiträge vorbereiten
-- Beitrag erstellen implementieren
-- Feed aus Firestore laden
-- Beiträge nach Datum sortieren
-- Empty State für leeren Feed anzeigen
-- Eigene Beiträge löschen
-- Löschoption nur bei eigenen Beiträgen anzeigen
+Technische Aufgaben:
+- Post-Modell für MongoDB erstellen
+- REST Endpoints für Beiträge erstellen
+- Beiträge in MongoDB speichern
+- Feed Endpoint nach Datum sortieren
+- Flutter Feed Screen mit Backend verbinden
+- Beitrag erstellen in der App umsetzen
+- Beitrag löschen nur für eigene Beiträge erlauben
+- Ladezustände in der App anzeigen
 
 Ergebnis:
-Der Feed funktioniert als Kernbereich der App.
+Der Feed funktioniert als Kernbereich der App und nutzt MongoDB für Beiträge.
 
 ## Sprint 4: Likes, Kommentare und Profil
 
@@ -109,21 +120,21 @@ Geplante User Stories:
 - US-22 Kommentare anzeigen
 - US-23 Kommentar-Anzahl anzeigen
 
-Aufgaben:
-- User-Daten in Firestore speichern und laden
-- Profil anzeigen
-- Profil bearbeiten
-- Eigene Beiträge im Profil anzeigen
-- Like- und Unlike-Funktion implementieren
-- Like-Anzahl aktualisieren
-- Comments Screen umsetzen
-- Kommentare speichern und anzeigen
-- Kommentar-Anzahl anzeigen
+Technische Aufgaben:
+- Profile Endpoints im Backend erstellen
+- Profil in PostgreSQL speichern und aktualisieren
+- Like-Modell und Like Endpoints erstellen
+- Likes in PostgreSQL speichern
+- Comment-Modell für MongoDB erstellen
+- Kommentare in MongoDB speichern
+- Comments Screen mit Backend verbinden
+- Like-Anzahl und Kommentar-Anzahl anzeigen
+- Eigene Beiträge im Profil laden
 
 Ergebnis:
-Die App ist als einfache Social-Media-App vollständig nutzbar.
+Die App ist als einfache Social-Media-App vollständig nutzbar und verwendet SQL und NoSQL sinnvoll zusammen.
 
-## Sprint 5: Testing, Bugfixing, Dokumentation und Präsentation
+## Sprint 5: Testing, Bugfixing, Docker-Doku und Präsentation
 
 **Zeitraum:** Woche 5
 
@@ -134,12 +145,17 @@ Geplante User Stories:
 - Offene Must-have Stories fertigstellen
 - Fehler aus vorherigen Sprints beheben
 
-Aufgaben:
+Technische Aufgaben:
 - Manuelle Tests durchführen
+- Flutter App lokal auf Emulator oder Handy testen
+- Backend, PostgreSQL und MongoDB über Docker Compose testen
 - Login, Registrierung, Feed, Likes, Kommentare und Profil testen
 - Fehler beheben
+- Netzwerkfehler sinnvoll anzeigen
 - UI verbessern
 - Dokumentation vervollständigen
+- Docker Startanleitung dokumentieren
+- SQL/NoSQL-Aufteilung dokumentieren
 - Screenshots vorbereiten
 - Präsentation und Demo-Ablauf vorbereiten
 

@@ -29,8 +29,13 @@ Aufgaben:
 **Verantwortlich:** Alen Arandjelovic und Dylan Kolb
 
 Aufgaben:
-- Flutter-App entwickeln
-- Firebase einbinden
+- Flutter-App mit Dart entwickeln
+- Flutter-App lokal auf Emulator oder Handy testen
+- Spring Boot Backend entwickeln
+- PostgreSQL als SQL-Datenbank anbinden
+- MongoDB als NoSQL-Datenbank anbinden
+- Docker Compose Setup für Backend, PostgreSQL und MongoDB erstellen und pflegen
+- REST API zwischen App und Backend umsetzen
 - User Stories technisch umsetzen
 - Funktionen testen
 - Fehler beheben
@@ -75,6 +80,8 @@ Eine User Story gilt als fertig, wenn:
 - die Funktion umgesetzt ist
 - die Akzeptanzkriterien erfüllt sind
 - die App ohne sichtbare Fehler läuft
+- Backend Endpoints funktionieren, falls die Story Backend-Logik braucht
+- Daten korrekt in PostgreSQL oder MongoDB gespeichert oder gelesen werden, falls nötig
 - Eingaben validiert werden, falls nötig
 - Ladezustände oder Fehlermeldungen vorhanden sind, falls nötig
 - die Funktion kurz getestet wurde
