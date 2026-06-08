@@ -16,6 +16,11 @@ target/
 *.war
 *.ear
 
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins-dependencies
+**/build/
+
 # Android / Gradle
 .gradle/
 build/

@@ -38,6 +38,11 @@ Before implementation starts, the developer or AI agent must read the issue and 
 
 ## Commit Rules
 
+Commits must list only the human author. Do not add `Co-authored-by: Cursor` or `Made-with: Cursor`.
+
+- Disable **Cursor Settings → Agents → Attribution → Commit Attribution** (recommended).
+- Or run `scripts/setup-git-hooks.ps1` once per clone to strip Cursor trailers via `.githooks/prepare-commit-msg`.
+
 Use small commits with direct messages.
 
 When a commit completes an issue, include:
