@@ -7,10 +7,12 @@ These rules are mandatory for Cursor, Copilot, Codex, and any other AI agent edi
 - Backend language: Java 21 or newer.
 - Backend framework: Spring Boot 4.0+ as defined by `pulse-backend/pom.xml`.
 - Build tool: Maven.
-- Mobile client: Android native Java.
-- Persistence: MongoDB for backend NoSQL storage, Room/SQLite for local Android SQL storage.
+- Mobile client: Flutter with Dart 3+ in `pulse-flutter/`.
+- Persistence: MongoDB for backend NoSQL storage, sqflite (or drift) for local Flutter SQL storage.
 
 ## Modern Ecosystem Boundaries
+
+### Backend
 
 - Use Spring Boot 4 style dependencies and APIs. Prefer granular Spring Boot 4 starters such as `spring-boot-starter-webmvc` over legacy broad starters when applicable.
 - Do not introduce deprecated Spring APIs, outdated framework patterns, or obsolete Java idioms.
@@ -19,7 +21,18 @@ These rules are mandatory for Cursor, Copilot, Codex, and any other AI agent edi
 - Prefer built-in Java and Spring functionality before adding external dependencies.
 - Do not add libraries without a clear architectural reason and a current, maintained release.
 
+### Mobile (Flutter)
+
+- Use Flutter and Dart only. Do not add new native Android Java/Kotlin code under `pulse-android/`.
+- Prefer `http` or `dio` for REST calls to the Spring Boot backend.
+- Use `sqflite` or `drift` for local SQL storage (replaces Room/SQLite from the old native Android approach).
+- Use immutable model classes for API request/response DTOs with `fromJson`/`toJson`.
+- Keep Flutter dependencies minimal and current. Do not add packages without a clear reason.
+- Organize code by feature under `lib/features/` (for example `auth`, `user`, `post`, `comment`, `like`, `feed`).
+
 ## Clean Code Rules
+
+### Backend
 
 - Apply SOLID strictly.
 - Single Responsibility Principle is mandatory. A class must have one reason to change.
@@ -31,7 +44,20 @@ These rules are mandatory for Cursor, Copilot, Codex, and any other AI agent edi
 - Keep services as the home of business logic.
 - Keep repositories as persistence-only abstractions.
 
+### Mobile (Flutter)
+
+- Apply SOLID strictly.
+- Keep widgets and screens focused on UI. Move business logic into services or notifiers.
+- Keep methods focused. If a method grows beyond 20 lines, refactor it.
+- Use descriptive names based on intent. Avoid cryptic abbreviations.
+- Avoid duplication. Extract repeated behavior into cohesive services or widgets.
+- Keep screens thin. Screens compose widgets and delegate behavior to services.
+- Keep services as the home of business logic and API orchestration.
+- Keep repositories as persistence-only abstractions for API and local SQL access.
+
 ## Architecture Rules
+
+### Backend
 
 - Enforce strict Controller -> Service -> Repository flow.
 - Controllers must never call repositories directly.
@@ -42,19 +68,36 @@ These rules are mandatory for Cursor, Copilot, Codex, and any other AI agent edi
 - Field-level `@Autowired` is banned in production code.
 - Keep package boundaries aligned by feature: `auth`, `user`, `post`, `comment`, `like`, `feed`, and similar domains.
 
+### Mobile (Flutter)
+
+- Enforce strict Screen/Widget -> Service/Notifier -> Repository flow.
+- Screens and widgets must not call repositories directly.
+- Repositories must not depend on UI layers.
+- Do not place business logic in widgets, DTOs, or repositories.
+- Prefer constructor injection and explicit dependencies over global singletons.
+- Keep feature boundaries aligned: `auth`, `user`, `post`, `comment`, `like`, `feed`, and similar domains.
+
 ## Testing and Verification
+
+### Backend
 
 - Every feature must include automated tests for the happy path and at least one failure path.
 - Do not bypass the Jacoco coverage gate.
 - Do not weaken ArchUnit architecture tests to make a bad design pass.
 - If a rule fails, improve the code rather than deleting the rule.
 
+### Mobile (Flutter)
+
+- Every feature must include automated tests for the happy path and at least one failure path.
+- Run `flutter analyze` and `flutter test` from `pulse-flutter/` before reporting completion.
+- Do not delete or weaken tests to make a build pass.
+
 ## Git and Issue Workflow
 
-- Use branches named `feature/issue-XYZ-short-description`.
+- Create a feature branch per issue.
+- Branch naming: `feature/issue-XYZ-short-description`.
 - Every commit that completes an issue must include `closes #XYZ`.
-- Pull requests must target `develop` unless the team explicitly agrees otherwise.
-- Do not push directly to `main`.
+- Open pull requests into `main`. Do not push directly to `main`.
 - PRs must pass CI before merge.
 
 ## Security and Secrets

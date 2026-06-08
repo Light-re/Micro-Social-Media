@@ -2,6 +2,8 @@
 
 Diese Liste ist für Ajan vorbereitet. Jede User Story soll als eigenes GitHub Issue angelegt werden.
 
+**Stack-Pivot (Flutter):** Siehe [Flutter-Stack-Pivot-Issues.md](Flutter-Stack-Pivot-Issues.md) für Issues zum Wechsel von nativem Android Java zu Flutter/Dart.
+
 ## Labels
 
 - `type:user-story`
@@ -14,7 +16,8 @@ Diese Liste ist für Ajan vorbereitet. Jede User Story soll als eigenes GitHub I
 - `area:profile`
 - `area:comments`
 - `area:backend`
-- `area:android`
+- `area:flutter`
+- `area:mobile`
 - `area:scrum`
 
 ## Milestones
@@ -30,7 +33,7 @@ Diese Liste ist für Ajan vorbereitet. Jede User Story soll als eigenes GitHub I
 
 ### US-13 Beitrag erstellen
 
-Labels: `type:user-story`, `priority:must-have`, `area:feed`, `area:backend`, `area:android`
+Labels: `type:user-story`, `priority:must-have`, `area:feed`, `area:backend`, `area:flutter`
 
 Milestone: Sprint 2
 

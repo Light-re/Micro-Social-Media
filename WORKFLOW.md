@@ -81,12 +81,12 @@ AI agents must:
 
 - inspect the existing package structure before editing
 - keep changes scoped to the issue
-- use Java records for DTOs
-- use constructor injection
-- avoid field-level `@Autowired`
-- avoid direct Controller -> Repository access
+- for backend: use Java records for DTOs, constructor injection, and no field-level `@Autowired`
+- for mobile: use Flutter/Dart in `pulse-flutter/`, immutable DTO models, and Screen -> Service -> Repository layering
+- avoid direct Controller -> Repository access in the backend
+- avoid direct Widget/Screen -> Repository access in Flutter
 - add or update tests for changed behavior
-- run relevant Maven checks before reporting completion
+- run relevant backend and/or Flutter checks before reporting completion
 
 AI agents must not:
 
@@ -96,6 +96,8 @@ AI agents must not:
 - commit `.env`, `application-secrets.properties`, API keys, or generated local files
 
 ## Verification Commands
+
+### Backend
 
 Run from the repository root:
 
@@ -111,6 +113,17 @@ The `mvn clean test` command runs:
 - ArchUnit architecture checks
 - Jacoco coverage report
 - Jacoco 80% line coverage gate
+
+### Mobile (Flutter)
+
+Run from the repository root:
+
+```bash
+cd pulse-flutter
+flutter pub get
+flutter analyze
+flutter test
+```
 
 ## Definition of Done
 
