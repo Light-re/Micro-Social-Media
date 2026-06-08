@@ -5,8 +5,10 @@ This repository uses a lightweight trunk-based workflow with strict CI gates. Th
 ## Branch Strategy
 
 - `main`: stable branch, always releasable.
-- `develop`: integration branch for sprint work.
 - Feature branches: one branch per GitHub issue.
+
+All work flows directly into `main` through pull requests. There is no `develop`
+branch in the team workflow.
 
 Branch naming:
 
@@ -54,7 +56,7 @@ If a commit only partially contributes to an issue, do not use `closes`.
 
 ## Pull Request Rules
 
-Every feature branch must open a pull request into `develop`.
+Every feature branch must open a pull request into `main`.
 
 PR requirements:
 
@@ -119,5 +121,5 @@ An issue is done when:
 - tests cover the happy path and at least one failure path
 - CI passes
 - PR is reviewed
-- PR is merged into `develop`
+- PR is merged into `main`
 - issue is closed through `closes #XYZ`

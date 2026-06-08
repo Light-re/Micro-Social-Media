@@ -87,7 +87,7 @@ Nach dem Review wird kurz reflektiert:
 ## Definition of Done
 
 Eine User Story gilt als fertig, wenn:
-- Code auf `develop` gemerged ist
+- Code per Pull Request auf `main` gemerged ist
 - keine Compile-Errors vorhanden sind
 - keine offensichtlichen Runtime-Crashes auftreten
 - die Funktion auf dem Emulator getestet wurde
