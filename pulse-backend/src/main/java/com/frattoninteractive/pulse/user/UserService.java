@@ -16,17 +16,17 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     public User register(RegisterRequest request) {
-        if (userRepository.existsByEmailIgnoreCase(request.getEmail())) {
+        if (userRepository.existsByEmailIgnoreCase(request.email())) {
             throw new DuplicateResourceException("Email is already registered");
         }
-        if (userRepository.existsByUsernameIgnoreCase(request.getUsername())) {
+        if (userRepository.existsByUsernameIgnoreCase(request.username())) {
             throw new DuplicateResourceException("Username is already taken");
         }
 
         User user = User.builder()
-                .email(request.getEmail().trim().toLowerCase())
-                .username(request.getUsername().trim())
-                .passwordHash(passwordEncoder.encode(request.getPassword()))
+                .email(request.email().trim().toLowerCase())
+                .username(request.username().trim())
+                .passwordHash(passwordEncoder.encode(request.password()))
                 .createdAt(Instant.now())
                 .build();
 

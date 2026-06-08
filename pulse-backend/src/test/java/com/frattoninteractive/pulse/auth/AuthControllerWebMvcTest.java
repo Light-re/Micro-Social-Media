@@ -34,12 +34,7 @@ class AuthControllerWebMvcTest {
     @Test
     void register_returnsCreatedWithToken() throws Exception {
         when(authService.register(any())).thenReturn(
-                AuthResponse.builder()
-                        .token("jwt-token")
-                        .userId("user-1")
-                        .email("dev@pulse.test")
-                        .username("devuser")
-                        .build());
+                new AuthResponse("jwt-token", "user-1", "dev@pulse.test", "devuser"));
 
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -65,12 +60,7 @@ class AuthControllerWebMvcTest {
     @Test
     void login_returnsOkWithToken() throws Exception {
         when(authService.login(any())).thenReturn(
-                AuthResponse.builder()
-                        .token("jwt-token")
-                        .userId("user-1")
-                        .email("dev@pulse.test")
-                        .username("devuser")
-                        .build());
+                new AuthResponse("jwt-token", "user-1", "dev@pulse.test", "devuser"));
 
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)

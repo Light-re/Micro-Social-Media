@@ -19,11 +19,10 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<UserMeResponse> me(@AuthenticationPrincipal JwtPrincipal principal) {
         User user = userService.findById(principal.userId());
-        return ResponseEntity.ok(UserMeResponse.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .username(user.getUsername())
-                .createdAt(user.getCreatedAt())
-                .build());
+        return ResponseEntity.ok(new UserMeResponse(
+                user.getId(),
+                user.getEmail(),
+                user.getUsername(),
+                user.getCreatedAt()));
     }
 }

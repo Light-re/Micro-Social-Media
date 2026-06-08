@@ -2,15 +2,13 @@ package com.frattoninteractive.pulse.auth.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
 
-@Data
-public class LoginRequest {
+public record LoginRequest(
+        @NotBlank
+        @Email
+        String email,
 
-    @NotBlank
-    @Email
-    private String email;
-
-    @NotBlank
-    private String password;
+        @NotBlank
+        String password
+) {
 }

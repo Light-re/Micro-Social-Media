@@ -1,0 +1,58 @@
+name: Backend CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Compile, Test, Coverage, Architecture
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pulse-backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+          cache-dependency-path: pulse-backend/pom.xml
+
+      - name: Restore Maven repository cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ runner.os }}-${{ hashFiles('pulse-backend/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-
+
+      - name: Compile
+        run: mvn -B clean compile
+
+      - name: Test with Jacoco coverage gate
+        run: mvn -B clean test
+
+      - name: Upload Jacoco report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: pulse-backend/target/site/jacoco
+          if-no-files-found: ignore
