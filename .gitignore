@@ -27,6 +27,7 @@ local.properties
 
 # Android Studio / IntelliJ
 .idea/
+.vscode/settings.json
 *.iml
 
 # Logs
