@@ -94,6 +94,7 @@ These rules are mandatory for Cursor, Copilot, Codex, and any other AI agent edi
 
 ## Git and Issue Workflow
 
+- Never add `Co-authored-by: Cursor`, `Made-with: Cursor`, or any Cursor/agent attribution to commits or PRs.
 - Create a feature branch per issue.
 - Branch naming: `feature/issue-XYZ-short-description`.
 - Every commit that completes an issue must include `closes #XYZ`.
