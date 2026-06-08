@@ -24,8 +24,8 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        User user = userService.findByEmail(request.getEmail().trim().toLowerCase());
-        if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+        User user = userService.findByEmail(request.email().trim().toLowerCase());
+        if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
             throw new BadCredentialsException("Invalid credentials");
         }
         return buildAuthResponse(user);
@@ -33,11 +33,6 @@ public class AuthService {
 
     private AuthResponse buildAuthResponse(User user) {
         String token = jwtUtil.generateToken(user.getId(), user.getEmail());
-        return AuthResponse.builder()
-                .token(token)
-                .userId(user.getId())
-                .email(user.getEmail())
-                .username(user.getUsername())
-                .build();
+        return new AuthResponse(token, user.getId(), user.getEmail(), user.getUsername());
     }
 }

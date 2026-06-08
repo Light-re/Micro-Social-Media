@@ -1,0 +1,63 @@
+# AI Governance Rules for Pulse
+
+These rules are mandatory for Cursor, Copilot, Codex, and any other AI agent editing this repository.
+
+## Target Stack
+
+- Backend language: Java 21 or newer.
+- Backend framework: Spring Boot 4.0+ as defined by `pulse-backend/pom.xml`.
+- Build tool: Maven.
+- Mobile client: Android native Java.
+- Persistence: MongoDB for backend NoSQL storage, Room/SQLite for local Android SQL storage.
+
+## Modern Ecosystem Boundaries
+
+- Use Spring Boot 4 style dependencies and APIs. Prefer granular Spring Boot 4 starters such as `spring-boot-starter-webmvc` over legacy broad starters when applicable.
+- Do not introduce deprecated Spring APIs, outdated framework patterns, or obsolete Java idioms.
+- Use Java 21 language features where they make code clearer.
+- Use Java `record` types for all request and response DTOs.
+- Prefer built-in Java and Spring functionality before adding external dependencies.
+- Do not add libraries without a clear architectural reason and a current, maintained release.
+
+## Clean Code Rules
+
+- Apply SOLID strictly.
+- Single Responsibility Principle is mandatory. A class must have one reason to change.
+- Keep methods focused. If a method grows beyond 20 lines, refactor it.
+- Use descriptive names based on intent. Avoid cryptic abbreviations.
+- Avoid duplication. Extract repeated behavior into cohesive services or helper methods.
+- Prefer tell-don't-ask. Ask objects to perform behavior instead of pulling state out and branching externally.
+- Keep controllers thin. Controllers translate HTTP requests and responses only.
+- Keep services as the home of business logic.
+- Keep repositories as persistence-only abstractions.
+
+## Architecture Rules
+
+- Enforce strict Controller -> Service -> Repository flow.
+- Controllers must never call repositories directly.
+- Repositories must never depend on controllers or services.
+- Do not place business logic in controllers, DTOs, entities, or repositories.
+- Use constructor injection only.
+- Use Lombok `@RequiredArgsConstructor` for Spring components where useful.
+- Field-level `@Autowired` is banned in production code.
+- Keep package boundaries aligned by feature: `auth`, `user`, `post`, `comment`, `like`, `feed`, and similar domains.
+
+## Testing and Verification
+
+- Every feature must include automated tests for the happy path and at least one failure path.
+- Do not bypass the Jacoco coverage gate.
+- Do not weaken ArchUnit architecture tests to make a bad design pass.
+- If a rule fails, improve the code rather than deleting the rule.
+
+## Git and Issue Workflow
+
+- Use branches named `feature/issue-XYZ-short-description`.
+- Every commit that completes an issue must include `closes #XYZ`.
+- Pull requests must target `develop` unless the team explicitly agrees otherwise.
+- Do not push directly to `main`.
+- PRs must pass CI before merge.
+
+## Security and Secrets
+
+- Never commit `.env`, `application-secrets.properties`, API keys, database credentials intended as secrets, JWT secrets, or Firebase configuration files.
+- Local development credentials in `docker-compose.yml` are for local development only and must never be presented as production-safe.
