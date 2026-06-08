@@ -14,7 +14,7 @@ Diese Liste ist für Ajan vorbereitet. Jede User Story soll als eigenes GitHub I
 - `area:profile`
 - `area:comments`
 - `area:backend`
-- `area:android`
+- `area:flutter`
 - `area:scrum`
 
 ## Milestones
@@ -30,7 +30,7 @@ Diese Liste ist für Ajan vorbereitet. Jede User Story soll als eigenes GitHub I
 
 ### US-13 Beitrag erstellen
 
-Labels: `type:user-story`, `priority:must-have`, `area:feed`, `area:backend`, `area:android`
+Labels: `type:user-story`, `priority:must-have`, `area:feed`, `area:backend`, `area:flutter`
 
 Milestone: Sprint 2
 

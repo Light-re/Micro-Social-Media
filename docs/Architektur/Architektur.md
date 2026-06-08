@@ -4,39 +4,40 @@
 
 Pulse besteht aus zwei Hauptteilen:
 
-- Android Client
+- Flutter Mobile Client
 - Spring Boot Backend
 
-Der Android Client kommuniziert über Retrofit und OkHttp mit dem Spring Boot Backend. Das Backend speichert cloudbasierte Daten in MongoDB. Die Android App nutzt zusätzlich Room/SQLite als lokale SQL-Datenbank.
+Der Flutter Client kommuniziert über REST mit dem Spring Boot Backend. Das Backend speichert cloudbasierte Daten in MongoDB. Die App nutzt zusätzlich eine lokale SQL-Datenbank, geplant mit `sqflite` oder `drift`.
 
 ```text
-Android App (Java)
+Flutter App (Dart)
         |
-        | Retrofit / REST
+        | REST API
         v
 Spring Boot Backend
         |
         v
 MongoDB (NoSQL)
 
-Android App
+Flutter App
         |
         v
-Room / SQLite (SQL lokal)
+sqflite / drift (SQL lokal)
 ```
 
-## Android Client
+## Flutter Client
 
 Technologien:
-- Android Native
-- Java
-- Activities / Fragments / XML
-- ViewModel + LiveData
-- Repository Pattern
-- Retrofit + OkHttp
-- Room Database
+
+- Flutter
+- Dart
+- Widgets
+- Feature-Struktur unter `lib/features/`
+- HTTP-Client für REST API
+- geplante lokale SQL-Datenbank mit `sqflite` oder `drift`
 
 Aufgaben:
+
 - UI anzeigen
 - User-Eingaben validieren
 - REST API aufrufen
@@ -46,6 +47,7 @@ Aufgaben:
 ## Backend
 
 Technologien:
+
 - Spring Boot
 - Maven
 - Spring Web
@@ -54,6 +56,7 @@ Technologien:
 - Spring Data MongoDB
 
 Aufgaben:
+
 - REST API bereitstellen
 - Registrierung und Login verarbeiten
 - JWT erstellen und prüfen
@@ -74,9 +77,9 @@ MongoDB wird für cloudbasierte Social-Media-Daten verwendet:
 
 NoSQL passt hier, weil Posts und Kommentare flexibel aufgebaut sind und schnell als Dokumente gelesen werden können.
 
-### Room / SQLite (SQL lokal)
+### sqflite / drift (SQL lokal)
 
-Room wird lokal auf dem Android-Gerät verwendet:
+Die lokale SQL-Datenbank wird im Flutter-Client verwendet für:
 
 - posts_cache
 - bookmarks
@@ -90,22 +93,25 @@ Docker wird für lokale Entwicklungsservices verwendet:
 
 - Spring Boot Backend
 - MongoDB
-- optional Mongo Express als Datenbank-GUI
+- Mongo Express als Datenbank-GUI
 
-Die Android App selbst wird nicht in Docker gestartet. Sie läuft lokal in Android Studio auf einem Emulator oder auf einem echten Gerät.
+Die Flutter App selbst wird nicht in Docker gestartet. Sie läuft lokal in Android Studio oder VS Code auf einem Emulator oder auf einem echten Gerät.
 
 ## Geplante REST Endpoints
 
 Auth:
+
 - `POST /api/auth/register`
 - `POST /api/auth/login`
 
 User:
+
 - `GET /api/users/{id}`
 - `GET /api/users/me`
 - `PUT /api/users/me`
 
 Posts:
+
 - `GET /api/posts/feed`
 - `POST /api/posts`
 - `DELETE /api/posts/{id}`
@@ -119,7 +125,7 @@ Posts:
 ```text
 pulse/
   pulse-backend/
-  pulse-android/
+  pulse-flutter/
   docker-compose.yml
   README.md
   docs/

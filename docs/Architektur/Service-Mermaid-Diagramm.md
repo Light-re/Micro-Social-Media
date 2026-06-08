@@ -4,7 +4,7 @@ Dieses Diagramm zeigt die geplanten Services von Pulse. Die bereits vorhandenen 
 
 ```mermaid
 flowchart TB
-    APP["Android App\npulse-android\nJava"]
+    APP["Flutter App\npulse-flutter\nDart"]
 
     subgraph BACKEND["Spring Boot Backend: pulse-backend"]
         subgraph EXISTING["Bereits vorhanden"]
@@ -32,8 +32,6 @@ flowchart TB
 
         subgraph PLANNED_EXTRA["Optional / spätere Sprints"]
             FOLLOW_SVC["FollowService\nFollow / Unfollow"]
-            CHAT_SVC["ChatService\nRealtime Chat"]
-            STORY_SVC["StoryService\nStories mit Ablaufzeit"]
             EXPLORE_SVC["ExploreService\nExplore Feed"]
             MEDIA_SVC["MediaService\nBilder Upload"]
             NOTIFY_SVC["NotificationService\nPush Notifications"]
@@ -43,7 +41,7 @@ flowchart TB
 
     subgraph DATA["Datenhaltung"]
         MONGO["MongoDB\nNoSQL"]
-        ROOM["Room / SQLite\nSQL lokal auf Android"]
+        SQL["sqflite / drift\nSQL lokal im Flutter-Client"]
     end
 
     subgraph EXTERNAL["Externe / optionale Dienste"]
@@ -51,14 +49,14 @@ flowchart TB
         OPENAI["OpenAI Moderation API\noptional"]
     end
 
-    APP -->|"REST API mit Retrofit"| AUTH_CTRL
-    APP -->|"REST API mit Retrofit"| USER_CTRL
+    APP -->|"REST API über HTTP Client"| AUTH_CTRL
+    APP -->|"REST API über HTTP Client"| USER_CTRL
     APP -. "später" .-> POST_CTRL
     APP -. "später" .-> FEED_CTRL
     APP -. "später" .-> LIKE_CTRL
     APP -. "später" .-> COMMENT_CTRL
 
-    APP --> ROOM
+    APP --> SQL
 
     AUTH_CTRL --> AUTH_SVC
     AUTH_SVC --> USER_SVC
@@ -79,8 +77,6 @@ flowchart TB
     COMMENT_SVC -.-> MONGO
 
     FOLLOW_SVC -.-> MONGO
-    CHAT_SVC -.-> MONGO
-    STORY_SVC -.-> MONGO
     EXPLORE_SVC -.-> MONGO
     MEDIA_SVC -.-> MONGO
     NOTIFY_SVC -.-> FCM
@@ -90,18 +86,6 @@ flowchart TB
     USER_CTRL --> ERRORS
     POST_CTRL -.-> ERRORS
     COMMENT_CTRL -.-> ERRORS
-
-    classDef existing fill:#d9f7d9,stroke:#208a20,stroke-width:2px,color:#111;
-    classDef planned fill:#f2f2f2,stroke:#777,stroke-dasharray: 5 5,color:#111;
-    classDef data fill:#e8f0ff,stroke:#3366cc,color:#111;
-    classDef app fill:#fff4d6,stroke:#c28a00,color:#111;
-    classDef external fill:#f8e8ff,stroke:#8a33aa,stroke-dasharray: 5 5,color:#111;
-
-    class AUTH_CTRL,AUTH_SVC,JWT,USER_CTRL,USER_SVC,USER_REPO,ERRORS existing;
-    class POST_CTRL,POST_SVC,FEED_CTRL,FEED_SVC,LIKE_CTRL,LIKE_SVC,COMMENT_CTRL,COMMENT_SVC,FOLLOW_SVC,CHAT_SVC,STORY_SVC,EXPLORE_SVC,MEDIA_SVC,NOTIFY_SVC,MODERATION_SVC planned;
-    class MONGO,ROOM data;
-    class APP app;
-    class FCM,OPENAI external;
 ```
 
 ## Legende
@@ -109,7 +93,7 @@ flowchart TB
 - Grün: bereits im Backend vorhanden
 - Grau gestrichelt: geplant, aber noch nicht umgesetzt
 - Blau: Datenhaltung
-- Gelb: Android App
+- Gelb: Flutter App
 - Violett gestrichelt: externe optionale Dienste
 
 ## Bereits vorhandene Backend-Services
@@ -130,13 +114,3 @@ flowchart TB
 - `FeedService`
 - `LikeService`
 - `CommentService`
-
-## Optionale spätere Services
-
-- `FollowService`
-- `ChatService`
-- `StoryService`
-- `ExploreService`
-- `MediaService`
-- `NotificationService`
-- `ModerationService`

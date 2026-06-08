@@ -7,6 +7,7 @@ In diesem Schulprojekt werden die Scrum-Rollen klar auf die Teammitglieder verte
 **Verantwortlich:** Ajan Neziri
 
 Aufgaben:
+
 - Anforderungen und User Stories festlegen
 - Product Backlog priorisieren und aktuell halten
 - MVP-Umfang bestimmen
@@ -19,6 +20,7 @@ Aufgaben:
 **Verantwortlich:** Noé Fratton
 
 Aufgaben:
+
 - Scrum-Prozess einhalten
 - Sprint Planning, Standup, Review und Retrospektive moderieren
 - Hindernisse dokumentieren und lösen
@@ -31,11 +33,12 @@ Aufgaben:
 **Verantwortlich:** Alen Arandjelovic und Dylan Kolb
 
 Aufgaben:
-- Android-App mit Java entwickeln
+
+- Flutter-App mit Dart entwickeln
 - Spring Boot Backend mitentwickeln
 - REST API zwischen App und Backend umsetzen
 - MongoDB als NoSQL-Datenbank anbinden
-- Room Database als lokale SQL-Datenbank nutzen
+- lokale SQL-Datenbank mit `sqflite` oder `drift` nutzen
 - Features gemäss User Stories umsetzen
 - Funktionen auf dem Emulator testen
 - Pull Requests erstellen und reviewen
@@ -45,15 +48,16 @@ Aufgaben:
 | Person | Hauptfeature | Verantwortlich für |
 |---|---|---|
 | Noé Fratton | Auth + Scrum | Register, Login, JWT, Spring Security, GitHub-Pflege, Sprint-Moderation |
-| Ajan Neziri | Posts + Feed | Post-CRUD, Feed-Endpoint, Likes, Comments, Backlog pflegen |
-| Alen Arandjelovic | Follow + Chat | Follow/Unfollow, Realtime Chat, Profil-Page |
-| Dylan Kolb | Stories + Explore | Stories, Explore-Page, Push Notifications |
+| Ajan Neziri | Posts + Feed | Post-CRUD, Feed-Endpoint, Likes, Comments, Backlog pflegen, Flutter-Migration |
+| Alen Arandjelovic | Follow + Profil | Follow/Unfollow, Profil-Page |
+| Dylan Kolb | Explore + Testing | Explore-Page, UI-Feinschliff, manuelle Tests |
 
 ## Stakeholder
 
 **Verantwortlich:** Lehrperson / Modulverantwortliche
 
 Aufgaben:
+
 - Anforderungen des Moduls vorgeben
 - Feedback zum Projekt geben
 - Bewertung der fertigen App und Dokumentation
@@ -69,6 +73,7 @@ Montag um 08:00 Uhr werden Backlog-Punkte geschätzt, das Sprint-Ziel definiert 
 Im kleinen Schulprojekt wird das Standup wöchentlich am Montag durchgeführt und bei Bedarf async im Gruppenchat ergänzt.
 
 Fragen:
+
 - Was habe ich seit dem letzten Standup fertiggestellt?
 - Was werde ich bis zum nächsten Termin fertigstellen?
 - Was blockiert mich gerade?
@@ -80,6 +85,7 @@ Am Montag um 16:30 Uhr wird gezeigt, was im Sprint fertig wurde.
 ### Sprint Retrospektive
 
 Nach dem Review wird kurz reflektiert:
+
 - Was lief gut?
 - Was war schwierig?
 - Was wird nächste Woche verbessert?
@@ -87,6 +93,7 @@ Nach dem Review wird kurz reflektiert:
 ## Definition of Done
 
 Eine User Story gilt als fertig, wenn:
+
 - Code per Pull Request auf `main` gemerged ist
 - keine Compile-Errors vorhanden sind
 - keine offensichtlichen Runtime-Crashes auftreten

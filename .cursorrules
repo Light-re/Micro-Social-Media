@@ -7,8 +7,8 @@ These rules are mandatory for Cursor, Copilot, Codex, and any other AI agent edi
 - Backend language: Java 21 or newer.
 - Backend framework: Spring Boot 4.0+ as defined by `pulse-backend/pom.xml`.
 - Build tool: Maven.
-- Mobile client: Android native Java.
-- Persistence: MongoDB for backend NoSQL storage, Room/SQLite for local Android SQL storage.
+- Mobile client: Flutter with Dart.
+- Persistence: MongoDB for backend NoSQL storage, sqflite or drift for local mobile SQL storage.
 
 ## Modern Ecosystem Boundaries
 
@@ -53,7 +53,7 @@ These rules are mandatory for Cursor, Copilot, Codex, and any other AI agent edi
 
 - Use branches named `feature/issue-XYZ-short-description`.
 - Every commit that completes an issue must include `closes #XYZ`.
-- Pull requests must target `develop` unless the team explicitly agrees otherwise.
+- Pull requests must target `main`.
 - Do not push directly to `main`.
 - PRs must pass CI before merge.
 

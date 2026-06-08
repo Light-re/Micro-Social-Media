@@ -3,18 +3,18 @@
 ```mermaid
 flowchart TB
     subgraph DEV["Entwicklungsumgebung"]
-        AS["Android Studio"]
+        IDE["Android Studio / VS Code"]
         EMU["Android Emulator / echtes Android-Gerät"]
         COMPASS["MongoDB Compass optional"]
         BROWSER["Browser"]
     end
 
-    subgraph CLIENT["Android App: pulse-android"]
-        UI["Activities / Fragments / XML"]
-        VM["ViewModel + LiveData"]
-        REPO["Repository Layer"]
-        RETROFIT["Retrofit + OkHttp"]
-        ROOM["Room Database / SQLite\nSQL lokal"]
+    subgraph CLIENT["Flutter App: pulse-flutter"]
+        UI["Widgets"]
+        STATE["State / View Models geplant"]
+        REPO["Repository Layer geplant"]
+        HTTP["HTTP Client"]
+        SQL["sqflite / drift\nSQL lokal"]
         SESSION["user_session\nJWT + eigenes Profil"]
         CACHE["posts_cache / bookmarks\nOffline-Cache"]
     end
@@ -48,17 +48,17 @@ flowchart TB
         OPENAI["OpenAI Moderation API\nContent Moderation"]
     end
 
-    AS --> EMU
+    IDE --> EMU
     EMU --> UI
 
-    UI --> VM
-    VM --> REPO
-    REPO --> RETROFIT
-    REPO --> ROOM
-    ROOM --> SESSION
-    ROOM --> CACHE
+    UI --> STATE
+    STATE --> REPO
+    REPO --> HTTP
+    REPO --> SQL
+    SQL --> SESSION
+    SQL --> CACHE
 
-    RETROFIT -->|"REST API\nhttp://10.0.2.2:8080/api\noder localhost bei Gerät/Setup"| BACKEND
+    HTTP -->|"REST API\nhttp://10.0.2.2:8080/api"| BACKEND
 
     BACKEND --> SECURITY
     SECURITY --> AUTH
@@ -86,27 +86,14 @@ flowchart TB
 
     BACKEND -. "spätere Sprints" .-> OPENAI
     BACKEND -. "spätere Sprints" .-> FCM
-
-    classDef local fill:#e8f2ff,stroke:#2f6fbb,color:#111;
-    classDef docker fill:#fff4df,stroke:#c27b00,color:#111;
-    classDef backend fill:#eaf7ea,stroke:#2d8a34,color:#111;
-    classDef data fill:#f3e8ff,stroke:#7a3db8,color:#111;
-    classDef optional fill:#f5f5f5,stroke:#777,color:#111,stroke-dasharray: 5 5;
-
-    class AS,EMU,COMPASS,BROWSER,UI,VM,REPO,RETROFIT,ROOM,SESSION,CACHE local;
-    class BACKEND,MONGO,MONGOEXP docker;
-    class AUTH,SECURITY,USER,POST,COMMENT,LIKE,MONGO_REPO backend;
-    class USERS,POSTS,COMMENTS,LIKES,FOLLOWS data;
-    class FCM,OPENAI optional;
 ```
 
 ## Kurz erklärt
 
-- Die Android App läuft lokal in Android Studio auf einem Emulator oder echten Android-Gerät.
-- Die App nutzt Retrofit und OkHttp, um REST Requests an das Spring Boot Backend zu senden.
+- Die Flutter App läuft lokal in Android Studio oder VS Code auf einem Emulator oder echten Gerät.
+- Die App nutzt einen HTTP-Client, um REST Requests an das Spring Boot Backend zu senden.
 - Das Spring Boot Backend läuft im Docker Compose Stack auf Port `8080`.
 - MongoDB läuft ebenfalls im Docker Compose Stack auf Port `27017`.
 - Mongo Express läuft auf Port `8081` und dient als einfache Web-GUI für MongoDB.
-- Room/SQLite läuft lokal auf dem Android-Gerät und erfüllt den SQL-Teil des Projekts.
+- `sqflite` oder `drift` erfüllt den lokalen SQL-Teil des Projekts.
 - MongoDB erfüllt den NoSQL-Teil des Projekts.
-- Firebase Cloud Messaging und OpenAI Moderation sind nur optionale spätere Erweiterungen.
