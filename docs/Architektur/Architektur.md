@@ -114,10 +114,10 @@ User:
 - `GET /api/users/me`
 - `PUT /api/users/me`
 
-Posts:
+Posts (siehe `docs/Architektur/Post-API.md` und `Feed-API.md`):
 
-- `GET /api/posts/feed`
 - `POST /api/posts`
+- `GET /api/posts/feed`
 - `DELETE /api/posts/{id}`
 - `POST /api/posts/{id}/like`
 - `DELETE /api/posts/{id}/like`

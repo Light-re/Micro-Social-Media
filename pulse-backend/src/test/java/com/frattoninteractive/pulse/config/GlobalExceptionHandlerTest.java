@@ -1,5 +1,7 @@
 package com.frattoninteractive.pulse.config;
 
+import com.frattoninteractive.pulse.post.PostForbiddenException;
+import com.frattoninteractive.pulse.post.PostNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ProblemDetail;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -26,5 +28,21 @@ class GlobalExceptionHandlerTest {
         assertThat(detail.getStatus()).isEqualTo(401);
         assertThat(detail.getTitle()).isEqualTo("Unauthorized");
         assertThat(detail.getDetail()).isEqualTo("Invalid credentials");
+    }
+
+    @Test
+    void handlePostNotFound_returnsNotFoundProblem() {
+        ProblemDetail detail = handler.handlePostNotFound(new PostNotFoundException("post-1"));
+
+        assertThat(detail.getStatus()).isEqualTo(404);
+        assertThat(detail.getDetail()).contains("post-1");
+    }
+
+    @Test
+    void handlePostForbidden_returnsForbiddenProblem() {
+        ProblemDetail detail = handler.handlePostForbidden(new PostForbiddenException("post-1"));
+
+        assertThat(detail.getStatus()).isEqualTo(403);
+        assertThat(detail.getDetail()).contains("post-1");
     }
 }

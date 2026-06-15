@@ -1,5 +1,7 @@
 package com.frattoninteractive.pulse.config;
 
+import com.frattoninteractive.pulse.post.PostForbiddenException;
+import com.frattoninteractive.pulse.post.PostNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -38,6 +40,22 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleBadCredentials(BadCredentialsException ex) {
         ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
         detail.setTitle("Unauthorized");
+        detail.setDetail(ex.getMessage());
+        return detail;
+    }
+
+    @ExceptionHandler(PostNotFoundException.class)
+    public ProblemDetail handlePostNotFound(PostNotFoundException ex) {
+        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+        detail.setTitle("Not found");
+        detail.setDetail(ex.getMessage());
+        return detail;
+    }
+
+    @ExceptionHandler(PostForbiddenException.class)
+    public ProblemDetail handlePostForbidden(PostForbiddenException ex) {
+        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.FORBIDDEN);
+        detail.setTitle("Forbidden");
         detail.setDetail(ex.getMessage());
         return detail;
     }
