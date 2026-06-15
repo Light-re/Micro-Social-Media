@@ -89,11 +89,15 @@ SQL passt hier, weil lokale Daten strukturiert und offline lesbar gespeichert we
 
 ## Docker
 
-Docker wird für lokale Entwicklungsservices verwendet:
+Docker Compose startet den lokalen Backend-Stack:
 
-- Spring Boot Backend
-- MongoDB
-- Mongo Express als Datenbank-GUI
+- **mongo** — MongoDB mit Healthcheck und Volume `mongo_data`
+- **backend** — Spring Boot API (Multi-Stage Build), wartet auf healthy Mongo
+- **mongo-express** — optionale DB-GUI (`--profile dev`)
+
+Alle Services nutzen das Netzwerk `pulse-net`. Healthchecks und Profile sind in `docker-compose.yml` definiert.
+
+Ausführliche Doku: [`docs/Architektur/Docker.md`](Docker.md)
 
 Die Flutter App selbst wird nicht in Docker gestartet. Sie läuft lokal in Android Studio oder VS Code auf einem Emulator oder auf einem echten Gerät.
 
