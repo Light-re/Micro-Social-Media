@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/di/app_services.dart';
+import '../../core/di/app_scope.dart';
 import '../../core/widgets/pulse_components.dart';
 import '../home/home_shell.dart';
 import 'auth_service.dart';
@@ -21,13 +21,18 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   late final AuthService _authService;
+  bool _servicesResolved = false;
   bool _isSubmitting = false;
   String? _errorMessage;
 
   @override
-  void initState() {
-    super.initState();
-    _authService = widget.authService ?? AppServices().authService;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_servicesResolved) {
+      return;
+    }
+    _servicesResolved = true;
+    _authService = widget.authService ?? AppScope.of(context).authService;
   }
 
   @override
@@ -120,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 28),
                 PulseButton(
                   label: _isSubmitting ? 'Signing in…' : 'Sign in',
-                  onPressed: _isSubmitting ? () {} : _submit,
+                  onPressed: _isSubmitting ? null : _submit,
                 ),
               ],
             ),

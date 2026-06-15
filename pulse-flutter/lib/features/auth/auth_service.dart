@@ -1,13 +1,19 @@
 import 'data/auth_api_repository.dart';
+import 'data/auth_response.dart';
 import 'data/session_record.dart';
 import 'data/session_repository.dart';
 
 /// Orchestrates auth API calls and local session persistence.
 class AuthService {
-  AuthService(this._authApiRepository, this._sessionRepository);
+  AuthService(
+    this._authApiRepository,
+    this._sessionRepository, {
+    DateTime Function() now = DateTime.now,
+  }) : _now = now;
 
   final AuthApiRepository _authApiRepository;
   final SessionRepository _sessionRepository;
+  final DateTime Function() _now;
 
   Future<void> register({
     required String email,
@@ -37,18 +43,23 @@ class AuthService {
     return _sessionRepository.getSession();
   }
 
+  Future<String?> currentUserId() async {
+    final session = await _sessionRepository.getSession();
+    return session?.userId;
+  }
+
   Future<void> logout() {
     return _sessionRepository.clearSession();
   }
 
-  Future<void> _saveSession(dynamic response) async {
-    await _sessionRepository.saveSession(
+  Future<void> _saveSession(AuthResponse response) {
+    return _sessionRepository.saveSession(
       SessionRecord(
         userId: response.userId,
         email: response.email,
         username: response.username,
         token: response.token,
-        savedAt: DateTime.now().toUtc(),
+        savedAt: _now().toUtc(),
       ),
     );
   }

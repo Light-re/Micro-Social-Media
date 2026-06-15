@@ -1,4 +1,4 @@
-/// Auth API response after register or login.
+/// Auth API response returned by `/api/auth/login` and `/api/auth/register`.
 class AuthResponse {
   const AuthResponse({
     required this.token,

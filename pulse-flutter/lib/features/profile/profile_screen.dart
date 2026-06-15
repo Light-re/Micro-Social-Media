@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/di/app_services.dart';
+import '../../core/di/app_scope.dart';
 import '../../core/widgets/pulse_components.dart';
 import '../user/data/user_api_repository.dart';
 import '../user/data/user_profile.dart';
@@ -18,14 +18,19 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   late final UserService _userService;
+  bool _servicesResolved = false;
   UserProfile? _profile;
   bool _isLoading = true;
   String? _errorMessage;
 
   @override
-  void initState() {
-    super.initState();
-    _userService = widget.userService ?? AppServices().userService;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_servicesResolved) {
+      return;
+    }
+    _servicesResolved = true;
+    _userService = widget.userService ?? AppScope.of(context).userService;
     _loadProfile();
   }
 
