@@ -22,29 +22,34 @@ jobs:
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
       flutter: ${{ steps.filter.outputs.flutter }}
+      shared: ${{ steps.filter.outputs.shared }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Detect relevant changes
-        uses: dorny/paths-filter@v3
         id: filter
+        uses: dorny/paths-filter@v3
         with:
           filters: |
             backend:
               - 'pulse-backend/**'
               - 'docker-compose.yml'
               - '.env.example'
+
             flutter:
               - 'pulse-flutter/**'
-          shared:
-            - '.github/workflows/**'
+
+            shared:
+              - '.github/workflows/**'
 
   backend:
     name: Backend — Compile, Test, Coverage, Architecture
     needs: changes
     if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true'
     runs-on: ubuntu-latest
+
     defaults:
       run:
         working-directory: pulse-backend
@@ -88,6 +93,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.flutter == 'true' || needs.changes.outputs.shared == 'true'
     runs-on: ubuntu-latest
+
     defaults:
       run:
         working-directory: pulse-flutter
@@ -113,9 +119,13 @@ jobs:
 
   ci-success:
     name: CI — Required
-    needs: [changes, backend, flutter]
+    needs:
+      - changes
+      - backend
+      - flutter
     if: always()
     runs-on: ubuntu-latest
+
     steps:
       - name: Verify required jobs
         run: |
@@ -137,5 +147,16 @@ jobs:
             echo "$name passed"
           }
 
-          check_job "${{ needs.changes.outputs.backend }}" "${{ needs.backend.result }}" "Backend"
-          check_job "${{ needs.changes.outputs.flutter }}" "${{ needs.flutter.result }}" "Flutter"
+          BACKEND_NEEDED="false"
+          FLUTTER_NEEDED="false"
+
+          if [ "${{ needs.changes.outputs.backend }}" = "true" ] || [ "${{ needs.changes.outputs.shared }}" = "true" ]; then
+            BACKEND_NEEDED="true"
+          fi
+
+          if [ "${{ needs.changes.outputs.flutter }}" = "true" ] || [ "${{ needs.changes.outputs.shared }}" = "true" ]; then
+            FLUTTER_NEEDED="true"
+          fi
+
+          check_job "$BACKEND_NEEDED" "${{ needs.backend.result }}" "Backend"
+          check_job "$FLUTTER_NEEDED" "${{ needs.flutter.result }}" "Flutter"
