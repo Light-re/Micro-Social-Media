@@ -1,87 +1,167 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/pulse_colors.dart';
+import '../../core/di/app_services.dart';
 import '../../core/widgets/pulse_components.dart';
-import '../../core/widgets/pulse_painters.dart';
+import '../user/data/user_api_repository.dart';
+import '../user/data/user_profile.dart';
+import '../user/user_service.dart';
+import 'edit_profile_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key, this.userService});
+
+  final UserService? userService;
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  late final UserService _userService;
+  UserProfile? _profile;
+  bool _isLoading = true;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _userService = widget.userService ?? AppServices().userService;
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final profile = await _userService.loadProfile();
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _profile = profile;
+        _isLoading = false;
+      });
+    } on StateError {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _errorMessage = 'Sign in to view your profile.';
+        _isLoading = false;
+      });
+    } on UserApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _errorMessage = error.message;
+        _isLoading = false;
+      });
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _errorMessage = 'Could not load profile.';
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _openEditProfile() async {
+    final profile = _profile;
+    if (profile == null) {
+      return;
+    }
+
+    final updated = await Navigator.of(context).push<UserProfile>(
+      MaterialPageRoute<UserProfile>(
+        builder: (_) => EditProfileScreen(
+          initialProfile: profile,
+          userService: _userService,
+        ),
+      ),
+    );
+
+    if (updated != null && mounted) {
+      setState(() => _profile = updated);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      appBar: AppBar(
+        title: const Text('Profile'),
+        actions: [
+          if (_profile != null)
+            IconButton(
+              onPressed: _openEditProfile,
+              icon: const Icon(Icons.edit_outlined),
+              tooltip: 'Edit profile',
+            ),
+        ],
+      ),
+      body: _buildBody(),
+    );
+  }
+
+  Widget _buildBody() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_errorMessage != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(
+            _errorMessage!,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+        ),
+      );
+    }
+
+    final profile = _profile!;
+    final bio = profile.bio.trim().isEmpty
+        ? 'No bio yet. Tap edit to add one.'
+        : profile.bio;
+
+    return RefreshIndicator(
+      onRefresh: _loadProfile,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  Text('Profile',
-                      style: Theme.of(context).textTheme.labelMedium),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('close'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 26),
-              Text(
-                '@mira',
-                style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                      fontSize: 64,
-                      color: PulseColors.coral,
+              PulseAvatar(username: profile.username, radius: 36),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      profile.username,
+                      style: Theme.of(context).textTheme.headlineMedium,
                     ),
-              ),
-              const SizedBox(height: 18),
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 22),
-                decoration: const BoxDecoration(
-                  border: Border(
-                    top: BorderSide(color: PulseColors.borderWarm),
-                    bottom: BorderSide(color: PulseColors.borderWarm),
-                  ),
+                    Text(
+                      '@${profile.username}',
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
+                  ],
                 ),
-                child: Text(
-                  '"collecting small weather from familiar people."',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontSize: 34,
-                        fontStyle: FontStyle.italic,
-                      ),
-                ),
-              ),
-              const SizedBox(height: 34),
-              Text('rhythm strip',
-                  style: Theme.of(context).textTheme.labelMedium),
-              const SizedBox(height: 16),
-              const SizedBox(
-                height: 164,
-                child: RhythmBars(
-                  values: [0.24, 0.62, 0.38, 0.9, 0.52, 0.77, 0.31, 0.68],
-                ),
-              ),
-              const SizedBox(height: 34),
-              const SignalPostBlock(
-                username: 'mira',
-                timestamp: '072 BPM',
-                text:
-                    'the room went quiet and somehow that felt like everyone replying at once.',
-                resonance: 12,
-                seed: 2,
-              ),
-              const SizedBox(height: 14),
-              const SignalPostBlock(
-                username: 'mira',
-                timestamp: 'YDAY',
-                text: 'kept one lamp on until the apartment remembered me.',
-                resonance: 19,
-                seed: 5,
               ),
             ],
           ),
-        ),
+          const SizedBox(height: 16),
+          Text(bio, style: Theme.of(context).textTheme.bodyLarge),
+        ],
       ),
     );
   }

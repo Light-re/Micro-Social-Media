@@ -3,17 +3,21 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pulse/core/strings/app_strings.dart';
 import 'package:pulse/core/theme/pulse_colors.dart';
 import 'package:pulse/features/feed/feed_screen.dart';
+import 'package:pulse/core/theme/pulse_theme.dart';
+import 'package:pulse/features/auth/login_screen.dart';
+import 'package:pulse/features/auth/register_screen.dart';
+import 'package:pulse/features/feed/compose_screen.dart';
+import 'package:pulse/features/home/home_shell.dart';
 import 'package:pulse/features/home/welcome_screen.dart';
-import 'package:pulse/features/profile/profile_screen.dart';
 import 'package:pulse/main.dart';
 
 void main() {
   testWidgets('shows Pulse welcome screen', (tester) async {
     await tester.pumpWidget(const PulseApp());
 
-    expect(find.text('PULSE'), findsOneWidget);
+    expect(find.text('Pulse'), findsOneWidget);
     expect(find.text(AppStrings.welcomeTagline), findsOneWidget);
-    expect(find.text('Enter the pulse'), findsOneWidget);
+    expect(find.text('Get started'), findsOneWidget);
     expect(find.byType(WelcomeScreen), findsOneWidget);
   });
 
@@ -32,15 +36,46 @@ void main() {
     expect(AppStrings.feedTitle, 'Feed');
     expect(AppStrings.feedEmptyMessage, 'Der Feed ist leer.');
     expect(AppStrings.feedEmptySubtext, 'Sobald neue Beiträge verfügbar sind, erscheinen sie hier.');
+  testWidgets('welcome routes to login', (tester) async {
+    await tester.pumpWidget(const PulseApp());
+
+    await tester.tap(find.text('Get started'));
+    await tester.pumpAndSettle();
+    expect(find.byType(LoginScreen), findsOneWidget);
+    expect(find.text('Welcome back'), findsOneWidget);
   });
 
-  test('PulseColors match dark prototype palette', () {
-    expect(PulseColors.background, const Color(0xFF0C0A0D));
-    expect(PulseColors.surface, const Color(0xFF161318));
-    expect(PulseColors.coral, const Color(0xFFFF3D5A));
-    expect(PulseColors.amber, const Color(0xFFF4A261));
-    expect(PulseColors.cyan, const Color(0xFF4CC9F0));
-    expect(PulseColors.textPrimary, const Color(0xFFF5F0EB));
-    expect(PulseColors.textMuted, const Color(0xFF8A7F85));
+  testWidgets('welcome routes to register', (tester) async {
+    await tester.pumpWidget(const PulseApp());
+
+    await tester.tap(find.text('Create account'));
+    await tester.pumpAndSettle();
+    expect(find.byType(RegisterScreen), findsOneWidget);
+    expect(find.text('Join Pulse'), findsOneWidget);
+  });
+
+  testWidgets('home shell opens compose from tab bar', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(theme: PulseTheme.light(), home: const HomeShell()),
+    );
+
+    expect(find.text('Pulse'), findsOneWidget);
+    expect(find.textContaining('room went quiet'), findsOneWidget);
+
+    await tester.tap(find.text('Post'));
+    await tester.pumpAndSettle();
+    expect(find.byType(ComposeScreen), findsOneWidget);
+    expect(find.text('New post'), findsOneWidget);
+  });
+
+  test('AppStrings expose Pulse copy', () {
+    expect(AppStrings.appName, 'Pulse');
+    expect(AppStrings.welcomeTagline, 'Social, simplified.');
+  });
+
+  test('PulseColors use muted coral accent', () {
+    expect(PulseColors.coral, const Color(0xFFE07373));
+    expect(PulseColors.lightBackground, const Color(0xFFF2F2F7));
+    expect(PulseColors.darkBackground, const Color(0xFF000000));
   });
 }

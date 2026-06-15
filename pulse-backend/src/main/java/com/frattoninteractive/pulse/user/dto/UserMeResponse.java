@@ -6,6 +6,7 @@ public record UserMeResponse(
         String id,
         String email,
         String username,
+        String bio,
         Instant createdAt
 ) {
 }
