@@ -1,6 +1,7 @@
 services:
   mongo:
     image: mongo:7
+    container_name: pulse-mongo
     ports:
       - "27017:27017"
     environment:
@@ -9,9 +10,21 @@ services:
       MONGO_INITDB_DATABASE: pulse
     volumes:
       - mongo_data:/data/db
+    networks:
+      - pulse-net
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
 
   mongo-express:
     image: mongo-express:latest
+    container_name: pulse-mongo-express
+    profiles:
+      - dev
     ports:
       - "8081:8081"
     environment:
@@ -20,18 +33,36 @@ services:
       ME_CONFIG_MONGODB_URL: mongodb://root:fratton2026@mongo:27017/
       ME_CONFIG_BASICAUTH: "false"
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
+    networks:
+      - pulse-net
+    restart: unless-stopped
 
   backend:
     build: ./pulse-backend
+    container_name: pulse-backend
     ports:
       - "8080:8080"
     environment:
-      JAVA_TOOL_OPTIONS: "-Dspring.data.mongodb.uri=mongodb://root:fratton2026@mongo:27017/pulse?authSource=admin"
       SPRING_DATA_MONGODB_URI: mongodb://root:fratton2026@mongo:27017/pulse?authSource=admin
       JWT_SECRET: ${JWT_SECRET:-local-dev-jwt-secret-min-32-characters!!}
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
+    networks:
+      - pulse-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    restart: unless-stopped
+
+networks:
+  pulse-net:
+    name: pulse-net
 
 volumes:
   mongo_data:

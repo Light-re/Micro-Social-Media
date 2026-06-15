@@ -70,6 +70,7 @@ Wichtige Dokumente:
 - `docs/SCRUM/Rollen/SCRUM-Rollen.md`
 - `docs/SCRUM/Sprint-Planung/Sprint-Planung.md`
 - `docs/Architektur/Architektur.md`
+- `docs/Architektur/Docker.md`
 - `docs/Architektur/Mermaid-Architektur.md`
 - `docs/Architektur/Service-Mermaid-Diagramm.md`
 - `docs/GitHub/GitHub-Issues.md`
@@ -112,15 +113,32 @@ In `.env` muss ein eigener `JWT_SECRET` stehen. Die Datei `.env` darf nie commit
 
 ### Stack starten
 
+Minimal (MongoDB + Backend):
+
 ```powershell
-docker compose up -d
+docker compose up -d --build
 ```
 
-| Dienst | URL |
-|---|---|
-| REST API | http://localhost:8080 |
-| Mongo Express | http://localhost:8081 |
-| MongoDB | `mongodb://root:fratton2026@localhost:27017/pulse?authSource=admin` |
+Mit Mongo Express DB-GUI:
+
+```powershell
+docker compose --profile dev up -d --build
+```
+
+| Dienst | URL | Profil |
+|---|---|---|
+| REST API | http://localhost:8080 | default |
+| Healthcheck | http://localhost:8080/actuator/health | default |
+| Mongo Express | http://localhost:8081 | `dev` |
+| MongoDB | `mongodb://root:fratton2026@localhost:27017/pulse?authSource=admin` | default |
+
+Details zum Docker-Stack: [`docs/Architektur/Docker.md`](docs/Architektur/Docker.md)
+
+```powershell
+docker compose ps
+docker compose logs -f backend
+docker compose down
+```
 
 ### Backend-Tests
 
