@@ -8,7 +8,13 @@ public interface PostService {
 
     PostResponse createPost(String authorId, CreatePostRequest request);
 
-    FeedResponse getFeed();
+    FeedResponse getFeed(String currentUserId);
 
     void deleteOwnPost(String authorId, String postId);
+
+    Post requirePost(String postId);
+
+    Post save(Post post);
+
+    PostResponse toResponse(Post post, String currentUserId);
 }
