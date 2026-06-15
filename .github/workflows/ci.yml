@@ -16,8 +16,34 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changes:
+    name: Detect changed paths
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      flutter: ${{ steps.filter.outputs.flutter }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect relevant changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'pulse-backend/**'
+              - 'docker-compose.yml'
+              - '.env.example'
+            flutter:
+              - 'pulse-flutter/**'
+          shared:
+            - '.github/workflows/**'
+
   backend:
     name: Backend — Compile, Test, Coverage, Architecture
+    needs: changes
+    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -59,6 +85,8 @@ jobs:
 
   flutter:
     name: Flutter — Analyze and Test
+    needs: changes
+    if: needs.changes.outputs.flutter == 'true' || needs.changes.outputs.shared == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -82,3 +110,32 @@ jobs:
 
       - name: Test
         run: flutter test
+
+  ci-success:
+    name: CI — Required
+    needs: [changes, backend, flutter]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify required jobs
+        run: |
+          check_job() {
+            local needed="$1"
+            local result="$2"
+            local name="$3"
+
+            if [ "$needed" != "true" ]; then
+              echo "$name skipped (no relevant file changes)"
+              return 0
+            fi
+
+            if [ "$result" != "success" ]; then
+              echo "$name failed or was cancelled (result=$result)"
+              exit 1
+            fi
+
+            echo "$name passed"
+          }
+
+          check_job "${{ needs.changes.outputs.backend }}" "${{ needs.backend.result }}" "Backend"
+          check_job "${{ needs.changes.outputs.flutter }}" "${{ needs.flutter.result }}" "Flutter"
