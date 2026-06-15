@@ -11,7 +11,7 @@ Official Flutter/Dart mobile client for Pulse (`com.frattoninteractive.pulse`).
 - Package-Name: `com.frattoninteractive.pulse`
 - Lokale Backend-URL im Android Emulator: `http://10.0.2.2:8080`
 - Lokale Backend-URL auf derselben Maschine: `http://localhost:8080`
-- Geplante lokale SQL-Datenbank: `sqflite` oder `drift`
+- Geplante lokale SQL-Datenbank: `sqflite`
 
 ## Voraussetzungen
 
@@ -43,15 +43,33 @@ Constants live in `lib/core/config/api_config.dart`.
 ```text
 lib/
   core/
-    config/        # API base URLs
-    strings/       # app copy migrated from Android strings.xml
-    theme/         # colors and ThemeData migrated from Android
+    config/
+    database/    # sqflite setup (user_session table)
+    strings/
+    theme/
   features/
     auth/
+      data/        # SessionRepository (local SQL)
     feed/
-    home/          # welcome screen (legacy MainActivity)
+      data/        # PostResponse, FeedResponse DTOs
+    home/
   main.dart
 ```
+
+## Lokale SQL (`sqflite`)
+
+Session-Daten (JWT, User-ID) werden in SQLite gespeichert:
+
+| Tabelle | Zweck |
+|---|---|
+| `user_session` | Ein aktiver Login (Token, User-Metadaten) |
+
+Klassen:
+
+- `lib/core/database/app_database.dart` — DB-Oeffnung und Schema
+- `lib/features/auth/data/session_repository.dart` — `saveSession`, `getSession`, `clearSession`
+
+Voraussetzung fuer **US-07 Auth-Status prüfen**.
 
 Architecture: **Screen/Widget -> Service -> Repository** (see repo root `.cursorrules`).
 
