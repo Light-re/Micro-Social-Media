@@ -15,7 +15,8 @@ class PulseApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: AppStrings.appName,
-      theme: PulseTheme.light(),
+      debugShowCheckedModeBanner: false,
+      theme: PulseTheme.dark(),
       home: const WelcomeScreen(),
     );
   }
