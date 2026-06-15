@@ -1,5 +1,5 @@
-/// Strings migrated from legacy `pulse-android/app/src/main/res/values/strings.xml`.
+/// App copy for the Pulse Flutter client.
 abstract final class AppStrings {
   static const String appName = 'Pulse';
-  static const String welcomeMessage = 'Pulse — Sprint 0 skeleton';
+  static const String welcomeTagline = 'Feel the room.';
 }
