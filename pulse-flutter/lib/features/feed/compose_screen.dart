@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../core/widgets/pulse_components.dart';
-
 class ComposeScreen extends StatefulWidget {
   const ComposeScreen({super.key});
 

@@ -2,6 +2,7 @@ package com.frattoninteractive.pulse.user;
 
 import com.frattoninteractive.pulse.auth.dto.RegisterRequest;
 import com.frattoninteractive.pulse.config.DuplicateResourceException;
+import com.frattoninteractive.pulse.user.dto.UpdateProfileRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -107,5 +108,39 @@ class UserServiceTest {
         assertThatThrownBy(() -> userService.findById("missing"))
                 .isInstanceOf(BadCredentialsException.class)
                 .hasMessage("User not found");
+    }
+
+    @Test
+    void updateProfile_withNewUsernameAndBio_persistsChanges() {
+        User user = User.builder()
+                .id("user-1")
+                .email("dev@pulse.test")
+                .username("devuser")
+                .bio("Old bio")
+                .build();
+        when(userRepository.findById("user-1")).thenReturn(Optional.of(user));
+        when(userRepository.existsByUsernameIgnoreCaseAndIdNot("newname", "user-1")).thenReturn(false);
+        when(userRepository.save(user)).thenAnswer(invocation -> invocation.getArgument(0));
+
+        User updated = userService.updateProfile("user-1", new UpdateProfileRequest(" newname ", " New bio "));
+
+        assertThat(updated.getUsername()).isEqualTo("newname");
+        assertThat(updated.getBio()).isEqualTo("New bio");
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void updateProfile_withTakenUsername_throwsDuplicateResourceException() {
+        User user = User.builder()
+                .id("user-1")
+                .email("dev@pulse.test")
+                .username("devuser")
+                .build();
+        when(userRepository.findById("user-1")).thenReturn(Optional.of(user));
+        when(userRepository.existsByUsernameIgnoreCaseAndIdNot("taken", "user-1")).thenReturn(true);
+
+        assertThatThrownBy(() -> userService.updateProfile("user-1", new UpdateProfileRequest("taken", "Bio")))
+                .isInstanceOf(DuplicateResourceException.class)
+                .hasMessage("Username is already taken");
     }
 }
