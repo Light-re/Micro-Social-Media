@@ -38,16 +38,18 @@ Use an Android emulator (API 26+) or a connected device.
 
 Constants live in `lib/core/config/api_config.dart`.
 
-Cleartext HTTP for local backend setup is enabled in the Android manifest for development.
-
 ## Project structure
 
 ```text
 lib/
-  core/          # shared config, theme, utilities
+  core/
+    config/        # API base URLs
+    strings/       # app copy migrated from Android strings.xml
+    theme/         # colors and ThemeData migrated from Android
   features/
-    auth/        # login, register, session
-    feed/        # posts, likes, comments
+    auth/
+    feed/
+    home/          # welcome screen (legacy MainActivity)
   main.dart
 ```
 
@@ -60,8 +62,20 @@ flutter analyze
 flutter test
 ```
 
-## Migration vom alten Android-Skeleton
+## Migration vom alten Android-Skeleton (`pulse-android`)
 
-Das fruehere `pulse-android/`-Skeleton bestand nur aus einer `MainActivity` mit einer Welcome-Nachricht. Diese Nachricht wurde in `lib/main.dart` als einfacher Welcome Screen uebernommen.
+Das native Java-Skeleton wurde vollstaendig nach Flutter portiert:
 
-Fuer API-Aufrufe gegen das lokale Backend wird im Emulator weiterhin `http://10.0.2.2:8080` verwendet.
+| Alt (`pulse-android`) | Neu (`pulse-flutter`) |
+|---|---|
+| `MainActivity.java` + `activity_main.xml` | `lib/features/home/welcome_screen.dart` |
+| `strings.xml` (`welcome_message`) | `lib/core/strings/app_strings.dart` |
+| `colors.xml` (`purple_500`, `white`) | `lib/core/theme/pulse_colors.dart` |
+| `themes.xml` (Material 3) | `lib/core/theme/pulse_theme.dart` |
+| `network_security_config.xml` | `android/app/src/main/res/xml/network_security_config.xml` |
+| Emulator-URL `http://10.0.2.2:8080` | `lib/core/config/api_config.dart` |
+| App-ID `com.frattoninteractive.pulse` | unveraendert im Flutter-Android-Teil |
+
+Cleartext HTTP ist nur fuer `localhost`, `127.0.0.1` und `10.0.2.2` erlaubt (wie im alten Skeleton), nicht app-weit.
+
+Retrofit, Room und Navigation waren im Java-Projekt nur vorbereitet und wurden nicht portiert. API- und SQL-Zugriff kommen in Flutter mit `http`/`dio` und `sqflite`/`drift`.
