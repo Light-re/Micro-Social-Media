@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../core/widgets/pulse_components.dart';
+import '../../core/di/app_scope.dart';
+import '../../core/network/api_exception.dart';
+import 'feed_service.dart';
 
 class ComposeScreen extends StatefulWidget {
   const ComposeScreen({super.key});
@@ -10,7 +12,17 @@ class ComposeScreen extends StatefulWidget {
 }
 
 class _ComposeScreenState extends State<ComposeScreen> {
-  String _draft = '';
+  final TextEditingController _controller = TextEditingController();
+  bool _isSubmitting = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  bool get _canSubmit =>
+      !_isSubmitting && _controller.text.trim().isNotEmpty;
 
   @override
   Widget build(BuildContext context) {
@@ -18,25 +30,31 @@ class _ComposeScreenState extends State<ComposeScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.close),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: _isSubmitting ? null : () => Navigator.of(context).pop(),
         ),
         title: const Text('New post'),
         actions: [
           TextButton(
-            onPressed: _draft.trim().isEmpty
-                ? null
-                : () => Navigator.of(context).pop(),
-            child: const Text('Post'),
+            onPressed: _canSubmit ? _submit : null,
+            child: _isSubmitting
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Text('Post'),
           ),
         ],
       ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
         child: TextField(
+          controller: _controller,
           autofocus: true,
           maxLines: null,
           expands: true,
-          onChanged: (value) => setState(() => _draft = value),
+          enabled: !_isSubmitting,
+          onChanged: (_) => setState(() {}),
           style: Theme.of(context).textTheme.bodyLarge,
           decoration: const InputDecoration(
             border: InputBorder.none,
@@ -45,5 +63,20 @@ class _ComposeScreenState extends State<ComposeScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _submit() async {
+    final FeedService feedService = AppScope.of(context).feedService;
+    setState(() => _isSubmitting = true);
+    try {
+      await feedService.createPost(_controller.text);
+      if (!mounted) return;
+      Navigator.of(context).pop(true);
+    } on ApiException catch (error) {
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.message)));
+    }
   }
 }

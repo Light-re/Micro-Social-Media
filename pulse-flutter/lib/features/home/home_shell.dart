@@ -13,6 +13,7 @@ class HomeShell extends StatefulWidget {
 }
 
 class _HomeShellState extends State<HomeShell> {
+  final GlobalKey<FeedScreenState> _feedKey = GlobalKey<FeedScreenState>();
   int _tab = 0;
 
   @override
@@ -20,21 +21,16 @@ class _HomeShellState extends State<HomeShell> {
     return Scaffold(
       body: IndexedStack(
         index: _tab,
-        children: const [
-          FeedScreen(),
-          ProfileScreen(),
+        children: [
+          FeedScreen(key: _feedKey),
+          const ProfileScreen(),
         ],
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _tab == 0 ? 0 : 2,
         onDestinationSelected: (index) {
           if (index == 1) {
-            Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                fullscreenDialog: true,
-                builder: (_) => const ComposeScreen(),
-              ),
-            );
+            _openCompose();
             return;
           }
           setState(() => _tab = index == 0 ? 0 : 1);
@@ -58,5 +54,17 @@ class _HomeShellState extends State<HomeShell> {
         ],
       ),
     );
+  }
+
+  Future<void> _openCompose() async {
+    final created = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        fullscreenDialog: true,
+        builder: (_) => const ComposeScreen(),
+      ),
+    );
+    if (created == true) {
+      await _feedKey.currentState?.reload();
+    }
   }
 }

@@ -1,10 +1,29 @@
 import 'package:flutter/material.dart';
 
+import '../../core/di/app_scope.dart';
+import '../../core/network/api_exception.dart';
 import '../../core/widgets/pulse_components.dart';
 import '../home/home_shell.dart';
+import 'auth_service.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _isSubmitting = false;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,25 +47,46 @@ class LoginScreen extends StatelessWidget {
                     ),
               ),
               const SizedBox(height: 32),
-              const PulseTextField(label: 'Email'),
+              PulseTextField(
+                label: 'Email',
+                controller: _emailController,
+              ),
               const SizedBox(height: 16),
-              const PulseTextField(label: 'Password', obscureText: true),
+              PulseTextField(
+                label: 'Password',
+                obscureText: true,
+                controller: _passwordController,
+              ),
               const SizedBox(height: 28),
               PulseButton(
-                label: 'Sign in',
-                onPressed: () {
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute<void>(
-                      builder: (_) => const HomeShell(),
-                    ),
-                    (_) => false,
-                  );
-                },
+                label: _isSubmitting ? 'Signing in…' : 'Sign in',
+                onPressed: _isSubmitting ? null : _submit,
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _submit() async {
+    final AuthService authService = AppScope.of(context).authService;
+    setState(() => _isSubmitting = true);
+    try {
+      await authService.login(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
+      if (!mounted) return;
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute<void>(builder: (_) => const HomeShell()),
+        (_) => false,
+      );
+    } on ApiException catch (error) {
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.message)));
+    }
   }
 }

@@ -36,10 +36,10 @@ class ProfileScreen extends StatelessWidget {
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 24),
-          Row(
+          const Row(
             children: [
               _StatChip(label: 'Posts', value: '24'),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               _StatChip(label: 'Likes', value: '186'),
             ],
           ),
