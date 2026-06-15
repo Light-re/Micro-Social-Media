@@ -29,6 +29,7 @@ class PulseTextField extends StatelessWidget {
     this.maxLines = 1,
     this.onChanged,
     this.controller,
+    this.validator,
   });
 
   final String label;
@@ -36,23 +37,39 @@ class PulseTextField extends StatelessWidget {
   final int maxLines;
   final ValueChanged<String>? onChanged;
   final TextEditingController? controller;
+  final FormFieldValidator<String>? validator;
 
   @override
   Widget build(BuildContext context) {
+    const decoration = InputDecoration();
+    final style = Theme.of(context).textTheme.bodyLarge;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: Theme.of(context).textTheme.labelMedium),
         const SizedBox(height: 8),
-        TextField(
-          controller: controller,
-          obscureText: obscureText,
-          maxLines: maxLines,
-          onChanged: onChanged,
-          cursorColor: PulseColors.coral,
-          style: Theme.of(context).textTheme.bodyLarge,
-          decoration: const InputDecoration(),
-        ),
+        if (validator != null)
+          TextFormField(
+            controller: controller,
+            obscureText: obscureText,
+            maxLines: maxLines,
+            onChanged: onChanged,
+            validator: validator,
+            cursorColor: PulseColors.coral,
+            style: style,
+            decoration: decoration,
+          )
+        else
+          TextField(
+            controller: controller,
+            obscureText: obscureText,
+            maxLines: maxLines,
+            onChanged: onChanged,
+            cursorColor: PulseColors.coral,
+            style: style,
+            decoration: decoration,
+          ),
       ],
     );
   }

@@ -12,32 +12,48 @@ typedef TokenProvider = Future<String?> Function();
 ///
 /// Returns the decoded JSON body (`Map`/`List`) on success, `null` for empty
 /// responses, and throws [ApiException] for transport or status failures.
+///
+/// A [tokenProvider] (when supplied) injects `Authorization: Bearer <token>`
+/// on every request; callers may still pass an explicit [token] per request to
+/// override it (used by the profile feature).
 class ApiClient {
   ApiClient({
-    required http.Client httpClient,
     required this.baseUrl,
-    required TokenProvider tokenProvider,
-  })  : _httpClient = httpClient,
-        _tokenProvider = tokenProvider;
+    http.Client? httpClient,
+    TokenProvider? tokenProvider,
+  })  : _httpClient = httpClient ?? http.Client(),
+        _tokenProvider = tokenProvider ?? _noToken;
 
-  final http.Client _httpClient;
   final String baseUrl;
+  final http.Client _httpClient;
   final TokenProvider _tokenProvider;
 
-  Future<dynamic> get(String path) async {
-    return _guard(() async => _httpClient.get(_uri(path), headers: await _headers()));
+  static Future<String?> _noToken() async => null;
+
+  Future<dynamic> get(String path, {String? token}) async {
+    return _guard(() async =>
+        _httpClient.get(_uri(path), headers: await _headers(token)));
   }
 
-  Future<dynamic> post(String path, {Object? body}) async {
+  Future<dynamic> post(String path, {String? token, Object? body}) async {
     return _guard(() async => _httpClient.post(
           _uri(path),
-          headers: await _headers(),
+          headers: await _headers(token),
           body: body == null ? null : jsonEncode(body),
         ));
   }
 
-  Future<dynamic> delete(String path) async {
-    return _guard(() async => _httpClient.delete(_uri(path), headers: await _headers()));
+  Future<dynamic> put(String path, {String? token, Object? body}) async {
+    return _guard(() async => _httpClient.put(
+          _uri(path),
+          headers: await _headers(token),
+          body: body == null ? null : jsonEncode(body),
+        ));
+  }
+
+  Future<dynamic> delete(String path, {String? token}) async {
+    return _guard(() async =>
+        _httpClient.delete(_uri(path), headers: await _headers(token)));
   }
 
   Uri _uri(String path) => Uri.parse('$baseUrl$path');
@@ -52,9 +68,9 @@ class ApiClient {
     }
   }
 
-  Future<Map<String, String>> _headers() async {
+  Future<Map<String, String>> _headers(String? explicitToken) async {
     final headers = {'Content-Type': 'application/json'};
-    final token = await _tokenProvider();
+    final token = explicitToken ?? await _tokenProvider();
     if (token != null && token.isNotEmpty) {
       headers['Authorization'] = 'Bearer $token';
     }

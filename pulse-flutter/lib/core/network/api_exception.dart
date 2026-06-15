@@ -37,9 +37,12 @@ class ApiException implements Exception {
     try {
       final decoded = jsonDecode(body);
       if (decoded is Map<String, dynamic>) {
-        final message = decoded['message'];
-        if (message is String && message.isNotEmpty) {
-          return message;
+        // Accept either a plain `message` or Spring's problem-detail fields.
+        for (final key in const ['message', 'detail', 'title']) {
+          final value = decoded[key];
+          if (value is String && value.isNotEmpty) {
+            return value;
+          }
         }
       }
     } on FormatException {

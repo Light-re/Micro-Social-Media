@@ -28,5 +28,7 @@ public class User {
 
     private String passwordHash;
 
+    private String bio;
+
     private Instant createdAt;
 }

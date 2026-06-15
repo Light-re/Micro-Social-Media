@@ -1,96 +1,171 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/pulse_colors.dart';
+import '../../core/di/app_scope.dart';
 import '../../core/widgets/pulse_components.dart';
+import '../user/data/user_api_repository.dart';
+import '../user/data/user_profile.dart';
+import '../user/user_service.dart';
+import 'edit_profile_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key, this.userService});
+
+  final UserService? userService;
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  late final UserService _userService;
+  bool _servicesResolved = false;
+  UserProfile? _profile;
+  bool _isLoading = true;
+  String? _errorMessage;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_servicesResolved) {
+      return;
+    }
+    _servicesResolved = true;
+    _userService = widget.userService ?? AppScope.of(context).userService;
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final profile = await _userService.loadProfile();
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _profile = profile;
+        _isLoading = false;
+      });
+    } on StateError {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _errorMessage = 'Sign in to view your profile.';
+        _isLoading = false;
+      });
+    } on UserApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _errorMessage = error.message;
+        _isLoading = false;
+      });
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _errorMessage = 'Could not load profile.';
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _openEditProfile() async {
+    final profile = _profile;
+    if (profile == null) {
+      return;
+    }
+
+    final updated = await Navigator.of(context).push<UserProfile>(
+      MaterialPageRoute<UserProfile>(
+        builder: (_) => EditProfileScreen(
+          initialProfile: profile,
+          userService: _userService,
+        ),
+      ),
+    );
+
+    if (updated != null && mounted) {
+      setState(() => _profile = updated);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
-      body: ListView(
+      appBar: AppBar(
+        title: const Text('Profile'),
+        actions: [
+          if (_profile != null)
+            IconButton(
+              onPressed: _openEditProfile,
+              icon: const Icon(Icons.edit_outlined),
+              tooltip: 'Edit profile',
+            ),
+        ],
+      ),
+      body: _buildBody(),
+    );
+  }
+
+  Widget _buildBody() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_errorMessage != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(
+            _errorMessage!,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+        ),
+      );
+    }
+
+    final profile = _profile!;
+    final bio = profile.bio.trim().isEmpty
+        ? 'No bio yet. Tap edit to add one.'
+        : profile.bio;
+
+    return RefreshIndicator(
+      onRefresh: _loadProfile,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
         children: [
           Row(
             children: [
-              const PulseAvatar(username: 'mira', radius: 36),
+              PulseAvatar(username: profile.username, radius: 36),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Mira',
-                        style: Theme.of(context).textTheme.headlineMedium),
-                    Text('@mira',
-                        style: Theme.of(context).textTheme.labelMedium),
+                    Text(
+                      profile.username,
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                    Text(
+                      '@${profile.username}',
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
                   ],
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          Text(
-            'Collecting small weather from familiar people.',
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
-          const SizedBox(height: 24),
-          const Row(
-            children: [
-              _StatChip(label: 'Posts', value: '24'),
-              SizedBox(width: 12),
-              _StatChip(label: 'Likes', value: '186'),
-            ],
-          ),
-          const SizedBox(height: 28),
-          Text('Recent posts',
-              style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 12),
-          const PulsePostCard(
-            username: 'mira',
-            displayName: 'Mira',
-            timestamp: '2h ago',
-            text:
-                'The room went quiet and somehow that felt like everyone replying at once.',
-            likeCount: 12,
-          ),
-          const SizedBox(height: 12),
-          const PulsePostCard(
-            username: 'mira',
-            displayName: 'Mira',
-            timestamp: 'Yesterday',
-            text: 'Kept one lamp on until the apartment remembered me.',
-            likeCount: 19,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StatChip extends StatelessWidget {
-  const _StatChip({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardTheme.color,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: PulseColors.coral.withValues(alpha: 0.2),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(value, style: Theme.of(context).textTheme.titleMedium),
-          Text(label, style: Theme.of(context).textTheme.labelMedium),
+          Text(bio, style: Theme.of(context).textTheme.bodyLarge),
         ],
       ),
     );

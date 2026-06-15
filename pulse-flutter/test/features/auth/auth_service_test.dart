@@ -3,9 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:pulse/core/database/app_database.dart';
 import 'package:pulse/core/network/api_client.dart';
-import 'package:pulse/core/network/api_exception.dart';
 import 'package:pulse/features/auth/auth_service.dart';
-import 'package:pulse/features/auth/data/auth_repository.dart';
+import 'package:pulse/features/auth/data/auth_api_repository.dart';
 import 'package:pulse/features/auth/data/session_repository.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -16,12 +15,8 @@ AuthService buildService(
   final apiClient = ApiClient(
     httpClient: MockClient(handler),
     baseUrl: 'http://test.local',
-    tokenProvider: () async => null,
   );
-  return AuthService(
-    authRepository: AuthRepository(apiClient),
-    sessionRepository: sessionRepository,
-  );
+  return AuthService(AuthApiRepository(apiClient), sessionRepository);
 }
 
 void main() {
@@ -46,21 +41,22 @@ void main() {
       sessionRepository,
     );
 
-    final result = await service.login('dev@pulse.test', 'secret123');
+    await service.login(email: 'dev@pulse.test', password: 'secret123');
 
-    expect(result.userId, 'user-1');
     expect(await service.currentUserId(), 'user-1');
+    final session = await service.currentSession();
+    expect(session?.username, 'devuser');
   });
 
-  test('login surfaces ApiException and stores nothing on failure', () async {
+  test('login surfaces AuthApiException and stores nothing on failure', () async {
     final service = buildService(
-      (_) async => http.Response('{"message":"Bad credentials"}', 401),
+      (_) async => http.Response('{"detail":"Bad credentials"}', 401),
       sessionRepository,
     );
 
     await expectLater(
-      service.login('dev@pulse.test', 'wrong'),
-      throwsA(isA<ApiException>()),
+      service.login(email: 'dev@pulse.test', password: 'wrong'),
+      throwsA(isA<AuthApiException>()),
     );
     expect(await service.currentUserId(), isNull);
   });

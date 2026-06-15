@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 
 import '../../features/auth/auth_service.dart';
-import '../../features/auth/data/auth_repository.dart';
+import '../../features/auth/data/auth_api_repository.dart';
 import '../../features/auth/data/session_repository.dart';
 import '../../features/comment/comment_service.dart';
 import '../../features/comment/data/comment_repository.dart';
@@ -9,6 +9,8 @@ import '../../features/feed/data/post_repository.dart';
 import '../../features/feed/feed_service.dart';
 import '../../features/like/data/like_repository.dart';
 import '../../features/like/like_service.dart';
+import '../../features/user/data/user_api_repository.dart';
+import '../../features/user/user_service.dart';
 import '../config/api_config.dart';
 import '../database/app_database.dart';
 import '../network/api_client.dart';
@@ -17,6 +19,7 @@ import '../network/api_client.dart';
 class AppDependencies {
   AppDependencies({
     required this.authService,
+    required this.userService,
     required this.feedService,
     required this.likeService,
     required this.commentService,
@@ -26,6 +29,7 @@ class AppDependencies {
         _database = database;
 
   final AuthService authService;
+  final UserService userService;
   final FeedService feedService;
   final LikeService likeService;
   final CommentService commentService;
@@ -53,10 +57,8 @@ class AppDependencies {
     return AppDependencies(
       httpClient: client,
       database: db,
-      authService: AuthService(
-        authRepository: AuthRepository(apiClient),
-        sessionRepository: sessions,
-      ),
+      authService: AuthService(AuthApiRepository(apiClient), sessions),
+      userService: UserService(UserApiRepository(apiClient), sessions),
       feedService: FeedService(PostRepository(apiClient)),
       likeService: LikeService(LikeRepository(apiClient)),
       commentService: CommentService(CommentRepository(apiClient)),

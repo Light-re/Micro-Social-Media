@@ -7,18 +7,19 @@ import 'auth_service.dart';
 import 'data/auth_api_repository.dart';
 import 'validators/form_validators.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key, this.authService});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key, this.authService});
 
   final AuthService? authService;
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   late final AuthService _authService;
   bool _servicesResolved = false;
@@ -38,6 +39,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void dispose() {
     _emailController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -50,8 +52,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _isSubmitting = true);
     try {
-      await _authService.login(
+      await _authService.register(
         email: _emailController.text.trim(),
+        username: _usernameController.text.trim(),
         password: _passwordController.text,
       );
       if (!mounted) {
@@ -64,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } on AuthApiException catch (error) {
       setState(() => _errorMessage = error.message);
     } catch (_) {
-      setState(() => _errorMessage = 'Sign in failed. Please try again.');
+      setState(() => _errorMessage = 'Registration failed. Please try again.');
     } finally {
       if (mounted) {
         setState(() => _isSubmitting = false);
@@ -75,22 +78,23 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Sign in')),
+      appBar: AppBar(title: const Text('Create account')),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
           child: Form(
             key: _formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Welcome back',
+                  'Join Pulse',
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Sign in to see posts from people you follow.',
+                  'Create an account to share posts with people you follow.',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context).textTheme.labelMedium?.color,
                       ),
@@ -103,15 +107,16 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 16),
                 PulseTextField(
+                  label: 'Username',
+                  controller: _usernameController,
+                  validator: validateUsername,
+                ),
+                const SizedBox(height: 16),
+                PulseTextField(
                   label: 'Password',
                   controller: _passwordController,
                   obscureText: true,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Password is required';
-                    }
-                    return null;
-                  },
+                  validator: validatePassword,
                 ),
                 if (_errorMessage != null) ...[
                   const SizedBox(height: 16),
@@ -124,8 +129,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
                 const SizedBox(height: 28),
                 PulseButton(
-                  label: _isSubmitting ? 'Signing in…' : 'Sign in',
-                  onPressed: _isSubmitting ? null : _submit,
+                  label: _isSubmitting ? 'Creating account…' : 'Create account',
+                  onPressed: _isSubmitting ? () {} : _submit,
                 ),
               ],
             ),
