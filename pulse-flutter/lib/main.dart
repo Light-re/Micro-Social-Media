@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'core/api_config.dart';
+import 'core/config/api_config.dart';
 
 void main() {
   runApp(const PulseApp());
@@ -42,7 +42,7 @@ class WelcomeScreen extends StatelessWidget {
             ),
             SizedBox(height: 12),
             Text(
-              ApiConfig.localBackendUrl,
+              ApiConfig.emulatorBaseUrl,
               style: TextStyle(fontSize: 14),
             ),
           ],
