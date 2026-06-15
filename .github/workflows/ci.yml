@@ -45,6 +45,14 @@ jobs:
     name: Backend — Compile, Test, Coverage, Architecture
     needs: changes
     runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:7
+        env:
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: fratton2026
+        ports:
+          - 27017:27017
     defaults:
       run:
         working-directory: pulse-backend
@@ -69,6 +77,8 @@ jobs:
 
       - name: Compile, test, and check coverage
         if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true'
+        env:
+          SPRING_DATA_MONGODB_URI: mongodb://root:fratton2026@localhost:27017/pulse?authSource=admin
         run: mvn -B verify
 
       - name: Upload Jacoco report
