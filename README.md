@@ -71,6 +71,8 @@ Wichtige Dokumente:
 - `docs/SCRUM/Sprint-Planung/Sprint-Planung.md`
 - `docs/Architektur/Architektur.md`
 - `docs/Architektur/Docker.md`
+- `docs/Architektur/Post-API.md`
+- `docs/Architektur/Feed-API.md`
 - `docs/Architektur/Mermaid-Architektur.md`
 - `docs/Architektur/Service-Mermaid-Diagramm.md`
 - `docs/GitHub/GitHub-Issues.md`
@@ -171,7 +173,10 @@ http://10.0.2.2:8080
 |---|---|---|
 | POST | `/api/auth/register` | nein |
 | POST | `/api/auth/login` | nein |
-| GET | `/api/users/me` | JWT `Bearer` |
+| GET | `/api/users/me` | JWT |
+| POST | `/api/posts` | JWT |
+| GET | `/api/posts/feed` | JWT |
+| DELETE | `/api/posts/{id}` | JWT |
 
 ## Auth-API testen
 
