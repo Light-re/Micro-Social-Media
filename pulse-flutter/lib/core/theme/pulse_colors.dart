@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
 
-/// Dark-first Pulse palette for the Flutter prototype.
+/// Apple-inspired palettes with a muted coral accent.
 abstract final class PulseColors {
-  static const Color background = Color(0xFF0C0A0D);
-  static const Color surface = Color(0xFF161318);
-  static const Color surfaceRaised = Color(0xFF211B22);
-  static const Color coral = Color(0xFFFF3D5A);
-  static const Color amber = Color(0xFFF4A261);
-  static const Color cyan = Color(0xFF4CC9F0);
-  static const Color textPrimary = Color(0xFFF5F0EB);
-  static const Color textMuted = Color(0xFF8A7F85);
-  static const Color borderWarm = Color(0xFF3B3035);
+  static const Color coral = Color(0xFFE07373);
+  static const Color coralSoft = Color(0xFFF2B8B8);
+
+  // Light
+  static const Color lightBackground = Color(0xFFF2F2F7);
+  static const Color lightSurface = Color(0xFFFFFFFF);
+  static const Color lightTextPrimary = Color(0xFF1C1C1E);
+  static const Color lightTextMuted = Color(0xFF8E8E93);
+  static const Color lightSeparator = Color(0xFFC6C6C8);
+
+  // Dark
+  static const Color darkBackground = Color(0xFF000000);
+  static const Color darkSurface = Color(0xFF1C1C1E);
+  static const Color darkSurfaceElevated = Color(0xFF2C2C2E);
+  static const Color darkTextPrimary = Color(0xFFFFFFFF);
+  static const Color darkTextMuted = Color(0xFF8E8E93);
+  static const Color darkSeparator = Color(0xFF38383A);
 }
