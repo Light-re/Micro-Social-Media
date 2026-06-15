@@ -2,6 +2,7 @@ package com.frattoninteractive.pulse.user;
 
 import com.frattoninteractive.pulse.auth.dto.RegisterRequest;
 import com.frattoninteractive.pulse.config.DuplicateResourceException;
+import com.frattoninteractive.pulse.user.dto.UpdateProfileRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ public class UserService {
                 .email(request.email().trim().toLowerCase())
                 .username(request.username().trim())
                 .passwordHash(passwordEncoder.encode(request.password()))
+                .bio("")
                 .createdAt(Instant.now())
                 .build();
 
@@ -41,5 +43,19 @@ public class UserService {
     public User findById(String id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new org.springframework.security.authentication.BadCredentialsException("User not found"));
+    }
+
+    public User updateProfile(String userId, UpdateProfileRequest request) {
+        User user = findById(userId);
+        String newUsername = request.username().trim();
+
+        if (!newUsername.equalsIgnoreCase(user.getUsername())
+                && userRepository.existsByUsernameIgnoreCaseAndIdNot(newUsername, userId)) {
+            throw new DuplicateResourceException("Username is already taken");
+        }
+
+        user.setUsername(newUsername);
+        user.setBio(request.bio() == null ? "" : request.bio().trim());
+        return userRepository.save(user);
     }
 }

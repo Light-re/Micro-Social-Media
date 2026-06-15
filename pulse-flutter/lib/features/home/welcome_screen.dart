@@ -4,6 +4,7 @@ import '../../core/strings/app_strings.dart';
 import '../../core/theme/pulse_colors.dart';
 import '../../core/widgets/pulse_components.dart';
 import '../auth/login_screen.dart';
+import '../auth/register_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -45,6 +46,17 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                   );
                 },
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const RegisterScreen(),
+                    ),
+                  );
+                },
+                child: const Text('Create account'),
               ),
               const SizedBox(height: 28),
             ],

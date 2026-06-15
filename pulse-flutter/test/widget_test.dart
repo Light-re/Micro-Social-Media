@@ -4,6 +4,7 @@ import 'package:pulse/core/strings/app_strings.dart';
 import 'package:pulse/core/theme/pulse_colors.dart';
 import 'package:pulse/core/theme/pulse_theme.dart';
 import 'package:pulse/features/auth/login_screen.dart';
+import 'package:pulse/features/auth/register_screen.dart';
 import 'package:pulse/features/feed/compose_screen.dart';
 import 'package:pulse/features/home/home_shell.dart';
 import 'package:pulse/features/home/welcome_screen.dart';
@@ -26,6 +27,15 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(LoginScreen), findsOneWidget);
     expect(find.text('Welcome back'), findsOneWidget);
+  });
+
+  testWidgets('welcome routes to register', (tester) async {
+    await tester.pumpWidget(const PulseApp());
+
+    await tester.tap(find.text('Create account'));
+    await tester.pumpAndSettle();
+    expect(find.byType(RegisterScreen), findsOneWidget);
+    expect(find.text('Join Pulse'), findsOneWidget);
   });
 
   testWidgets('home shell opens compose from tab bar', (tester) async {
