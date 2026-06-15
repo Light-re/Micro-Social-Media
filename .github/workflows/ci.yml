@@ -52,6 +52,7 @@ jobs:
     steps:
       - name: Skip backend checks
         if: needs.changes.outputs.backend != 'true' && needs.changes.outputs.shared != 'true'
+        working-directory: ${{ github.workspace }}
         run: echo "No backend changes in this commit."
 
       - name: Checkout
@@ -90,6 +91,7 @@ jobs:
     steps:
       - name: Skip flutter checks
         if: needs.changes.outputs.flutter != 'true' && needs.changes.outputs.shared != 'true'
+        working-directory: ${{ github.workspace }}
         run: echo "No flutter changes in this commit."
 
       - name: Checkout
