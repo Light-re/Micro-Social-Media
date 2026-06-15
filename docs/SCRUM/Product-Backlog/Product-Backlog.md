@@ -2,7 +2,7 @@
 
 Dieses Product Backlog basiert auf den User Stories der App **Pulse**. Die Priorisierung orientiert sich am MVP für ein realistisches 5-Wochen-Schulprojekt.
 
-Die App wird als native Android-App mit Java entwickelt. Das Backend wird mit Spring Boot umgesetzt. MongoDB wird als NoSQL-Datenbank verwendet. Room/SQLite wird als lokale SQL-Datenbank auf dem Android-Gerät eingesetzt.
+Die App wird mit Flutter/Dart entwickelt. Das Backend wird mit Spring Boot umgesetzt. MongoDB wird als NoSQL-Datenbank verwendet. `sqflite` oder `drift` wird als lokale SQL-Datenbank auf dem Gerät eingesetzt.
 
 ## Prioritäten
 
@@ -58,17 +58,21 @@ Die App wird als native Android-App mit Java entwickelt. Das Backend wird mit Sp
 
 | ID | Aufgabe | Priorität | Sprint | Verantwortlich | Status |
 |---|---|---|---|---|---|
-| T-01 | Android Studio Projekt `pulse-android` erstellen | Must-have | Sprint 0 | Noé | Offen |
-| T-02 | Spring Boot Projekt `pulse-backend` erstellen | Must-have | Sprint 0 | Noé | Offen |
-| T-03 | Docker Compose für Backend und MongoDB erstellen | Must-have | Sprint 0 | Noé | Offen |
-| T-04 | MongoDB Atlas oder lokale MongoDB vorbereiten | Must-have | Sprint 0 | Noé | Offen |
-| T-05 | Room Database im Android-Projekt vorbereiten | Must-have | Sprint 1 | Noé | Offen |
-| T-06 | GitHub Issues aus User Stories erstellen | Must-have | Sprint 0 | Ajan | Offen |
-| T-07 | Product Backlog priorisieren und pflegen | Must-have | Sprint 0-5 | Ajan | Offen |
-| T-08 | GitHub Project Board einrichten | Must-have | Sprint 0 | Noé | Offen |
-| T-09 | Post-API-Struktur definieren | Must-have | Sprint 2 | Ajan | Offen |
-| T-10 | Feed-API-Struktur definieren | Must-have | Sprint 2 | Ajan | Offen |
-| T-11 | SQL/NoSQL-Aufteilung dokumentieren | Should-have | Sprint 0 | Ajan | Offen |
+| T-01 | Flutter-Projekt `pulse-flutter` erstellen | Must-have | Sprint 0 | Noé | Fertig |
+| T-02 | Spring Boot Projekt `pulse-backend` erstellen | Must-have | Sprint 0 | Noé | Fertig |
+| T-03 | Docker Compose für Backend und MongoDB erstellen | Must-have | Sprint 0 | Noé | Fertig |
+| T-04 | MongoDB Atlas oder lokale MongoDB vorbereiten | Must-have | Sprint 0 | Noé | Fertig |
+| T-05 | Lokale SQL-Datenbank im Flutter-Projekt vorbereiten (`sqflite` oder `drift`) | Must-have | Sprint 1 | Noé | Offen |
+| T-06 | GitHub Issues aus User Stories erstellen | Must-have | Sprint 0 | Ajan | Fertig |
+| T-07 | Product Backlog priorisieren und pflegen | Must-have | Sprint 0-5 | Ajan | In Arbeit |
+| T-08 | Flutter-Projekt `pulse-flutter` initialisieren | Must-have | Sprint 0 | Ajan | Fertig |
+| T-09 | Java/Android-Skeleton nach Flutter/Dart migrieren | Must-have | Sprint 0 | Ajan | Fertig |
+| T-10 | Legacy-Ordner `pulse-android` entfernen | Must-have | Sprint 0 | Ajan | Fertig |
+| T-11 | Architektur- und Scrum-Dokumentation auf Flutter/Dart aktualisieren | Must-have | Sprint 0 | Ajan | Fertig |
+| T-12 | Flutter CI-Job ergänzen | Should-have | Sprint 1 | Ajan | Offen |
+| T-13 | Post-API-Struktur definieren | Must-have | Sprint 2 | Ajan | Offen |
+| T-14 | Feed-API-Struktur definieren | Must-have | Sprint 2 | Ajan | Offen |
+| T-15 | SQL/NoSQL-Aufteilung dokumentieren | Should-have | Sprint 0 | Ajan | Fertig |
 
 ## MVP-Umfang
 
@@ -82,6 +86,4 @@ Für das MVP werden Registrierung, Login, Feed, Posts, Likes, Kommentare, Profil
 - Push Notifications als Muss-Funktion
 - Algorithmischer Feed
 - Hashtags und Trends als Kernfunktion
-- Flutter App
 - React Web-Frontend
-- PostgreSQL

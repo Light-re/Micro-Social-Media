@@ -2,28 +2,31 @@
 
 Das Projekt wird agil mit Scrum geplant. Das Handoff beschreibt einen gemeinsamen Montag pro Woche und zusätzliche asynchrone Arbeit zwischen den Montagen.
 
-Die Zielarchitektur besteht aus einer nativen Android-App mit Java, einem Spring Boot Backend, MongoDB als NoSQL-Datenbank und Room/SQLite als lokaler SQL-Datenbank.
+Die Zielarchitektur besteht aus einer Flutter-App mit Dart, einem Spring Boot Backend, MongoDB als NoSQL-Datenbank und `sqflite` oder `drift` als lokaler SQL-Datenbank.
 
 ## Sprint 0: Setup und Vorbereitung
 
 **Sprint-Ziel:** Alle Teammitglieder können das Projekt lokal starten und kennen ihre Rollen.
 
 Geplante Aufgaben:
+
 - Java 21 installieren und prüfen
 - Docker Desktop installieren
-- Android Studio installieren
+- Flutter SDK installieren
+- Android Studio oder VS Code einrichten
 - Emulator einrichten
 - Spring Boot Projekt `pulse-backend` erstellen
-- Android Projekt `pulse-android` erstellen
+- Flutter Projekt `pulse-flutter` erstellen
+- altes `pulse-android`-Skeleton nach Flutter migrieren und entfernen
 - Docker Compose für Backend und MongoDB vorbereiten
 - MongoDB Atlas oder lokale MongoDB vorbereiten
 - User Stories als GitHub Issues anlegen
 - GitHub Project Board einrichten
-- Alle clonen das Repository und kompilieren die App
 
 Verantwortung:
-- Noé: Backend-Grundsetup, Android-Grundsetup, Docker, GitHub Board
-- Ajan: User Stories und Product Backlog pflegen, Issues vorbereiten
+
+- Noé: Backend-Grundsetup, Docker, GitHub Board
+- Ajan: User Stories, Product Backlog, Flutter-Migration und Dokumentation
 - Alle: lokale Entwicklungsumgebung einrichten
 
 ## Sprint 1: Authentifizierung
@@ -31,6 +34,7 @@ Verantwortung:
 **Sprint-Ziel:** Registrierung und Login funktionieren mit JWT und lokal gespeicherter Session.
 
 Geplante User Stories:
+
 - US-01 Registrierung öffnen
 - US-02 Registrierung durchführen
 - US-03 Nach Registrierung weiterleiten
@@ -44,14 +48,16 @@ Geplante User Stories:
 - US-31 Fehler verständlich anzeigen
 
 Technische Aufgaben:
+
 - Spring Security konfigurieren
 - JWT erstellen und prüfen
 - Auth Endpoints erstellen
-- Android Login und Register Screens umsetzen
-- Token lokal in Room speichern
+- Flutter Login und Register Screens umsetzen
+- Token lokal mit `sqflite` oder `drift` speichern
 - Session beim App-Start prüfen
 
 Hauptverantwortung:
+
 - Noé
 
 ## Sprint 2: Posts und Feed
@@ -59,6 +65,7 @@ Hauptverantwortung:
 **Sprint-Ziel:** User können Posts erstellen, im Feed sehen, liken und kommentieren.
 
 Geplante User Stories:
+
 - US-13 Beitrag erstellen
 - US-14 Beitrag im Feed anzeigen
 - US-15 Feed sortieren
@@ -76,14 +83,16 @@ Geplante User Stories:
 - US-30 Buttons während Laden sperren
 
 Technische Aufgaben:
+
 - Post-Modell in MongoDB erstellen
 - PostController, PostService und PostRepository erstellen
 - Endpoints für Feed, Create Post, Delete Post, Like, Unlike und Comments erstellen
-- Android Feed Screen mit Retrofit anbinden
-- Posts lokal in Room cachen
+- Flutter Feed Screen mit Backend anbinden
+- Posts lokal mit `sqflite` oder `drift` cachen
 - Empty State und Ladezustände im Feed anzeigen
 
 Hauptverantwortung:
+
 - Ajan
 
 ## Sprint 3: Follow und Profil
@@ -91,6 +100,7 @@ Hauptverantwortung:
 **Sprint-Ziel:** Profile und Follow-Funktionen sind nutzbar.
 
 Geplante Aufgaben:
+
 - Profil anzeigen
 - Profil bearbeiten
 - Eigene Beiträge im Profil anzeigen
@@ -98,20 +108,21 @@ Geplante Aufgaben:
 - Follower- und Following-Zähler aktualisieren
 
 Hauptverantwortung:
+
 - Alen
 
-## Sprint 4: Chat, Stories und Explore
+## Sprint 4: Explore und optionale Erweiterungen
 
-**Sprint-Ziel:** Erweiterte Social-Media-Funktionen werden umgesetzt, sofern das MVP stabil ist.
+**Sprint-Ziel:** Erweiterte Social-Media-Funktionen werden nur umgesetzt, wenn das MVP stabil ist.
 
 Geplante Aufgaben:
+
 - Explore-Page vorbereiten
-- Stories erstellen und anzeigen
-- Stories mit Ablaufzeit planen
-- Realtime Chat vorbereiten
-- Push Notifications prüfen
+- Optionale Benachrichtigungen prüfen
+- Content-Moderation prüfen
 
 Hauptverantwortung:
+
 - Alen und Dylan
 
 ## Sprint 5: Testing, Bugfixing und Präsentation
@@ -119,6 +130,7 @@ Hauptverantwortung:
 **Sprint-Ziel:** Die App ist stabil, dokumentiert und präsentierbar.
 
 Geplante Aufgaben:
+
 - Manuelle Tests auf dem Emulator durchführen
 - Happy Path und Fehlerfälle testen
 - Bugs beheben
@@ -128,6 +140,7 @@ Geplante Aufgaben:
 - Präsentation vorbereiten
 
 Hauptverantwortung:
+
 - Alle
 
 ## Sprint Review Vorlage
