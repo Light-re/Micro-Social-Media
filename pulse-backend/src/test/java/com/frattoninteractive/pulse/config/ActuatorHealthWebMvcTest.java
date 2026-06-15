@@ -17,8 +17,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         "jwt.secret=test-jwt-secret-at-least-32-characters-long",
         "jwt.expiration-ms=86400000",
         "management.endpoints.web.exposure.include=health",
-        "management.health.mongo.enabled=false",
-        "management.endpoint.health.probes.enabled=false"
+        "management.endpoint.health.probes.enabled=false",
+        "management.health.defaults.enabled=false",
+        "management.health.ping.enabled=true"
 })
 class ActuatorHealthWebMvcTest {
 
