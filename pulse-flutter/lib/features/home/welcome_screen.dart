@@ -3,10 +3,8 @@ import 'package:flutter/material.dart';
 import '../../core/strings/app_strings.dart';
 import '../../core/theme/pulse_colors.dart';
 import '../../core/widgets/pulse_components.dart';
-import '../../core/widgets/pulse_painters.dart';
 import '../auth/login_screen.dart';
 
-/// Splash/welcome screen for the Pulse prototype.
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
@@ -15,33 +13,31 @@ class WelcomeScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.symmetric(horizontal: 28),
           child: Column(
             children: [
               const Spacer(),
-              const SizedBox(
-                height: 112,
-                width: double.infinity,
-                child: CustomPaint(painter: EkgPainter()),
+              Container(
+                width: 48,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: PulseColors.coral.withValues(alpha: 0.55),
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
-              const SizedBox(height: 48),
-              Text(
-                'PULSE',
-                style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                      color: PulseColors.textPrimary,
-                    ),
-              ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 32),
+              Text('Pulse', style: Theme.of(context).textTheme.displayMedium),
+              const SizedBox(height: 10),
               Text(
                 AppStrings.welcomeTagline,
+                textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: PulseColors.textMuted,
-                      fontStyle: FontStyle.italic,
+                      color: Theme.of(context).textTheme.labelMedium?.color,
                     ),
               ),
               const Spacer(),
               PulseButton(
-                label: 'Enter the pulse',
+                label: 'Get started',
                 onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute<void>(
@@ -50,7 +46,7 @@ class WelcomeScreen extends StatelessWidget {
                   );
                 },
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 28),
             ],
           ),
         ),

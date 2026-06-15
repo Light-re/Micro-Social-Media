@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/pulse_colors.dart';
 import '../../core/widgets/pulse_components.dart';
-import '../../core/widgets/pulse_painters.dart';
-import '../feed/feed_screen.dart';
+import '../home/home_shell.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -11,47 +9,39 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: const Text('Sign in')),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 48, 24, 24),
+          padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(
-                height: 72,
-                width: 180,
-                child: CustomPaint(painter: EkgPainter(progress: 0.82)),
+              Text(
+                'Welcome back',
+                style: Theme.of(context).textTheme.headlineMedium,
               ),
-              const SizedBox(height: 48),
-              Text('Signal in',
-                  style: Theme.of(context).textTheme.headlineLarge),
               const SizedBox(height: 8),
               Text(
-                'A quiet room for the people you actually feel.',
+                'Sign in to see posts from people you follow.',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: PulseColors.textMuted,
-                      fontStyle: FontStyle.italic,
+                      color: Theme.of(context).textTheme.labelMedium?.color,
                     ),
               ),
-              const SizedBox(height: 40),
-              const PulseTextField(label: 'EMAIL'),
-              const SizedBox(height: 20),
-              const PulseTextField(label: 'PASSWORD', obscureText: true),
               const SizedBox(height: 32),
+              const PulseTextField(label: 'Email'),
+              const SizedBox(height: 16),
+              const PulseTextField(label: 'Password', obscureText: true),
+              const SizedBox(height: 28),
               PulseButton(
-                label: 'Enter',
+                label: 'Sign in',
                 onPressed: () {
-                  Navigator.of(context).pushReplacement(
+                  Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute<void>(
-                      builder: (_) => const FeedScreen(),
+                      builder: (_) => const HomeShell(),
                     ),
+                    (_) => false,
                   );
                 },
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'NO BROADCASTS. JUST SIGNALS.',
-                style: Theme.of(context).textTheme.labelMedium,
               ),
             ],
           ),

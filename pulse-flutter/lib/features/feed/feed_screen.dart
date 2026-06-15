@@ -2,44 +2,46 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/pulse_colors.dart';
 import '../../core/widgets/pulse_components.dart';
-import '../../core/widgets/pulse_painters.dart';
-import '../profile/profile_screen.dart';
-import 'transmit_screen.dart';
 
-class PulseSignal {
-  const PulseSignal({
+class FeedPost {
+  const FeedPost({
     required this.username,
+    required this.displayName,
     required this.timestamp,
     required this.text,
-    required this.resonance,
+    required this.likeCount,
   });
 
   final String username;
+  final String displayName;
   final String timestamp;
   final String text;
-  final int resonance;
+  final int likeCount;
 }
 
-const _signals = [
-  PulseSignal(
+const _posts = [
+  FeedPost(
     username: 'mira',
-    timestamp: '072 BPM',
+    displayName: 'Mira',
+    timestamp: '2h ago',
     text:
-        'the room went quiet and somehow that felt like everyone replying at once.',
-    resonance: 12,
+        'The room went quiet and somehow that felt like everyone replying at once.',
+    likeCount: 12,
   ),
-  PulseSignal(
+  FeedPost(
     username: 'noah',
-    timestamp: '018 MIN',
+    displayName: 'Noah',
+    timestamp: '18m ago',
     text:
-        'caught the tram home with rain on the glass. small city, loud chest.',
-    resonance: 8,
+        'Caught the tram home with rain on the glass. Small city, loud chest.',
+    likeCount: 8,
   ),
-  PulseSignal(
+  FeedPost(
     username: 'sana',
-    timestamp: 'NOW',
-    text: 'send me the songs that make the evening less rectangular.',
-    resonance: 21,
+    displayName: 'Sana',
+    timestamp: 'Just now',
+    text: 'Send me the songs that make the evening less rectangular.',
+    likeCount: 21,
   ),
 ];
 
@@ -49,162 +51,38 @@ class FeedScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            CustomScrollView(
-              slivers: [
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
-                  sliver: SliverToBoxAdapter(
-                    child: Row(
-                      children: [
-                        Text(
-                          'Pulse',
-                          style: Theme.of(context).textTheme.headlineLarge,
-                        ),
-                        const Spacer(),
-                        Text(
-                          'LIVE / 060',
-                          style: Theme.of(context).textTheme.labelMedium,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SliverList.separated(
-                  itemCount: _signals.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 14),
-                  itemBuilder: (context, index) {
-                    final signal = _signals[index];
-                    return SignalPostBlock(
-                      username: signal.username,
-                      timestamp: signal.timestamp,
-                      text: signal.text,
-                      resonance: signal.resonance,
-                      seed: index,
-                      onAuthorTap: () => _openProfile(context),
-                    );
-                  },
-                ),
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 128),
-                  sliver: SliverToBoxAdapter(
-                    child: _StoryboardStrip(
-                      onOpenProfile: () => _openProfile(context),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 24,
-              child: Center(
-                child: PulseOrbFab(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (context) => const TransmitScreen(),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _openProfile(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (context) => const ProfileScreen(),
-      ),
-    );
-  }
-}
-
-class _StoryboardStrip extends StatelessWidget {
-  const _StoryboardStrip({required this.onOpenProfile});
-
-  final VoidCallback onOpenProfile;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('motion studies', style: Theme.of(context).textTheme.labelMedium),
-        const SizedBox(height: 12),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              StoryboardPanel(
-                label: 'ripple like',
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    for (final size in [18.0, 34.0, 50.0])
-                      Container(
-                        width: size,
-                        height: size,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: PulseColors.coral.withValues(alpha: 0.55),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 10),
-              const StoryboardPanel(
-                label: 'refresh beat',
-                child: CustomPaint(
-                  size: Size(74, 40),
-                  painter: EkgPainter(),
-                ),
-              ),
-              const SizedBox(width: 10),
-              StoryboardPanel(
-                label: 'fab breath',
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    for (final size in [18.0, 24.0, 30.0])
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 2),
-                        child: Container(
-                          width: size,
-                          height: size,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: PulseColors.coral.withValues(alpha: 0.75),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 10),
-              StoryboardPanel(
-                label: 'profile',
-                child: TextButton(
-                  onPressed: onOpenProfile,
-                  child: const Text('@mira'),
-                ),
-              ),
-            ],
+      appBar: AppBar(
+        title: const Text('Pulse'),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(
+            height: 1,
+            color: PulseColors.coral.withValues(alpha: 0.35),
           ),
         ),
-      ],
+      ),
+      body: RefreshIndicator(
+        color: PulseColors.coral,
+        onRefresh: () async {
+          await Future<void>.delayed(const Duration(milliseconds: 600));
+        },
+        child: ListView.separated(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+          itemCount: _posts.length,
+          separatorBuilder: (context, index) => const SizedBox(height: 12),
+          itemBuilder: (context, index) {
+            final post = _posts[index];
+            return PulsePostCard(
+              username: post.username,
+              displayName: post.displayName,
+              timestamp: post.timestamp,
+              text: post.text,
+              likeCount: post.likeCount,
+            );
+          },
+        ),
+      ),
     );
   }
 }

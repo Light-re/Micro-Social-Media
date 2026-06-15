@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../theme/pulse_colors.dart';
-import 'pulse_painters.dart';
 
 class PulseButton extends StatelessWidget {
   const PulseButton({
@@ -17,23 +16,7 @@ class PulseButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final button = FilledButton(
-      onPressed: onPressed,
-      style: FilledButton.styleFrom(
-        backgroundColor: PulseColors.coral,
-        foregroundColor: PulseColors.textPrimary,
-        minimumSize: const Size(0, 56),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-        textStyle: const TextStyle(
-          fontFamily: 'JetBrainsMono',
-          fontSize: 13,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0,
-        ),
-      ),
-      child: Text(label),
-    );
-
+    final button = FilledButton(onPressed: onPressed, child: Text(label));
     return expand ? SizedBox(width: double.infinity, child: button) : button;
   }
 }
@@ -59,203 +42,120 @@ class PulseTextField extends StatelessWidget {
       children: [
         Text(label, style: Theme.of(context).textTheme.labelMedium),
         const SizedBox(height: 8),
-        DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border.all(color: PulseColors.borderWarm),
-            borderRadius: BorderRadius.circular(8),
-            color: PulseColors.surface,
-          ),
-          child: TextField(
-            obscureText: obscureText,
-            maxLines: maxLines,
-            onChanged: onChanged,
-            cursorColor: PulseColors.coral,
-            style: Theme.of(context).textTheme.bodyMedium,
-            decoration: const InputDecoration(
-              contentPadding:
-                  EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            ),
-          ),
+        TextField(
+          obscureText: obscureText,
+          maxLines: maxLines,
+          onChanged: onChanged,
+          cursorColor: PulseColors.coral,
+          style: Theme.of(context).textTheme.bodyLarge,
+          decoration: const InputDecoration(),
         ),
       ],
     );
   }
 }
 
-class PulseOrbFab extends StatefulWidget {
-  const PulseOrbFab({super.key, required this.onPressed});
+class PulseAvatar extends StatelessWidget {
+  const PulseAvatar({super.key, required this.username, this.radius = 22});
 
-  final VoidCallback onPressed;
-
-  @override
-  State<PulseOrbFab> createState() => _PulseOrbFabState();
-}
-
-class _PulseOrbFabState extends State<PulseOrbFab>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<double> _scale;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1000),
-    )..repeat(reverse: true);
-    _scale = Tween<double>(begin: 0.94, end: 1.06).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  final String username;
+  final double radius;
 
   @override
   Widget build(BuildContext context) {
-    return ScaleTransition(
-      scale: _scale,
-      child: GestureDetector(
-        onTap: widget.onPressed,
-        child: Container(
-          width: 72,
-          height: 72,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: PulseColors.coral,
-            boxShadow: [
-              BoxShadow(
-                color: PulseColors.coral.withValues(alpha: 0.42),
-                blurRadius: 28,
-                spreadRadius: 4,
-              ),
-            ],
-          ),
-          child: const Center(
-            child: WaveSpikeGlyph(size: 34, color: PulseColors.textPrimary),
-          ),
+    final initial = username.isNotEmpty ? username[0].toUpperCase() : '?';
+    return CircleAvatar(
+      radius: radius,
+      backgroundColor: PulseColors.coral.withValues(alpha: 0.18),
+      foregroundColor: PulseColors.coral,
+      child: Text(
+        initial,
+        style: TextStyle(
+          fontSize: radius * 0.78,
+          fontWeight: FontWeight.w600,
         ),
       ),
     );
   }
 }
 
-class SignalPostBlock extends StatelessWidget {
-  const SignalPostBlock({
+class PulsePostCard extends StatelessWidget {
+  const PulsePostCard({
     super.key,
     required this.username,
+    required this.displayName,
     required this.timestamp,
     required this.text,
-    required this.resonance,
+    required this.likeCount,
     this.onAuthorTap,
-    this.seed = 0,
+    this.onLikeTap,
   });
 
   final String username;
+  final String displayName;
   final String timestamp;
   final String text;
-  final int resonance;
+  final int likeCount;
   final VoidCallback? onAuthorTap;
-  final int seed;
+  final VoidCallback? onLikeTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
-      decoration: BoxDecoration(
-        color: PulseColors.surface,
-        border: Border(
-          top:
-              BorderSide(color: PulseColors.borderWarm.withValues(alpha: 0.75)),
-          bottom: BorderSide(
-            color: PulseColors.borderWarm.withValues(alpha: 0.75),
-          ),
-        ),
-      ),
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: IgnorePointer(
-              child: CustomPaint(
-                painter: WaveformPainter(
-                  color: PulseColors.amber,
-                  opacity: 0.08,
-                  seed: seed,
-                  intensity: 1.2,
+    final muted = Theme.of(context).textTheme.labelMedium;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                PulseAvatar(username: username),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: onAuthorTap,
+                    behavior: HitTestBehavior.opaque,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(displayName,
+                            style: Theme.of(context).textTheme.titleMedium),
+                        Text('@$username · $timestamp', style: muted),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            Text(text, style: Theme.of(context).textTheme.bodyLarge),
+            const SizedBox(height: 14),
+            InkWell(
+              onTap: onLikeTap,
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.favorite_border_rounded,
+                      size: 20,
+                      color: PulseColors.coral.withValues(alpha: 0.9),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      likeCount == 1 ? '1 like' : '$likeCount likes',
+                      style: muted,
+                    ),
+                  ],
                 ),
               ),
             ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              GestureDetector(
-                onTap: onAuthorTap,
-                child: Text(
-                  '@$username  $timestamp',
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: PulseColors.cyan,
-                      ),
-                ),
-              ),
-              const SizedBox(height: 18),
-              Text(text, style: Theme.of(context).textTheme.bodyLarge),
-              const SizedBox(height: 18),
-              Row(
-                children: [
-                  const WaveSpikeGlyph(size: 18),
-                  const SizedBox(width: 7),
-                  Text(
-                    '$resonance',
-                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                          color: PulseColors.textPrimary,
-                        ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class StoryboardPanel extends StatelessWidget {
-  const StoryboardPanel({
-    super.key,
-    required this.label,
-    required this.child,
-  });
-
-  final String label;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 104,
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: PulseColors.surface,
-        border: Border.all(color: PulseColors.borderWarm),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(height: 52, child: Center(child: child)),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.labelMedium,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

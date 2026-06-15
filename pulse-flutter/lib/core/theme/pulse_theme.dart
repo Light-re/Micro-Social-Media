@@ -1,76 +1,157 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'pulse_colors.dart';
 
-/// Theme migrated from legacy `pulse-android` Material 3 day/night theme.
 abstract final class PulseTheme {
-  static ThemeData dark() {
+  static ThemeData light() => _build(Brightness.light);
+
+  static ThemeData dark() => _build(Brightness.dark);
+
+  static ThemeData _build(Brightness brightness) {
+    final isLight = brightness == Brightness.light;
+    final background =
+        isLight ? PulseColors.lightBackground : PulseColors.darkBackground;
+    final surface = isLight ? PulseColors.lightSurface : PulseColors.darkSurface;
+    final textPrimary =
+        isLight ? PulseColors.lightTextPrimary : PulseColors.darkTextPrimary;
+    final textMuted =
+        isLight ? PulseColors.lightTextMuted : PulseColors.darkTextMuted;
+    final separator =
+        isLight ? PulseColors.lightSeparator : PulseColors.darkSeparator;
+
+    final colorScheme = ColorScheme(
+      brightness: brightness,
+      primary: PulseColors.coral,
+      onPrimary: Colors.white,
+      secondary: PulseColors.coralSoft,
+      onSecondary: textPrimary,
+      surface: surface,
+      onSurface: textPrimary,
+      error: PulseColors.coral,
+      onError: Colors.white,
+    );
+
     return ThemeData(
-      colorScheme: const ColorScheme.dark(
-        primary: PulseColors.coral,
-        secondary: PulseColors.amber,
-        tertiary: PulseColors.cyan,
-        surface: PulseColors.surface,
-        onSurface: PulseColors.textPrimary,
-        error: PulseColors.coral,
-      ),
-      scaffoldBackgroundColor: PulseColors.background,
       useMaterial3: true,
-      fontFamily: 'InstrumentSerif',
-      textTheme: const TextTheme(
-        displayLarge: TextStyle(
-          fontFamily: 'Syne',
-          fontSize: 58,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 0,
-          color: PulseColors.textPrimary,
+      brightness: brightness,
+      colorScheme: colorScheme,
+      scaffoldBackgroundColor: background,
+      dividerColor: separator,
+      appBarTheme: AppBarTheme(
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        backgroundColor: background,
+        foregroundColor: textPrimary,
+        systemOverlayStyle: isLight
+            ? SystemUiOverlayStyle.dark
+            : SystemUiOverlayStyle.light,
+        titleTextStyle: TextStyle(
+          color: textPrimary,
+          fontSize: 17,
+          fontWeight: FontWeight.w600,
+          letterSpacing: -0.4,
         ),
-        headlineLarge: TextStyle(
-          fontFamily: 'Syne',
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        elevation: 0,
+        height: 60,
+        backgroundColor: surface.withValues(alpha: isLight ? 0.94 : 0.98),
+        indicatorColor: PulseColors.coral.withValues(alpha: 0.14),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          final selected = states.contains(WidgetState.selected);
+          return TextStyle(
+            fontSize: 10,
+            fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+            color: selected ? PulseColors.coral : textMuted,
+          );
+        }),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          final selected = states.contains(WidgetState.selected);
+          return IconThemeData(
+            color: selected ? PulseColors.coral : textMuted,
+            size: 22,
+          );
+        }),
+      ),
+      cardTheme: CardThemeData(
+        color: surface,
+        elevation: 0,
+        margin: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: separator.withValues(alpha: 0.35)),
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: PulseColors.coral,
+          foregroundColor: Colors.white,
+          minimumSize: const Size(0, 50),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          textStyle: const TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+            letterSpacing: -0.3,
+          ),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: isLight
+            ? const Color(0xFFE5E5EA)
+            : PulseColors.darkSurfaceElevated,
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        hintStyle: TextStyle(color: textMuted, fontSize: 17),
+      ),
+      textTheme: TextTheme(
+        displayMedium: TextStyle(
           fontSize: 34,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 0,
-          color: PulseColors.textPrimary,
+          fontWeight: FontWeight.w700,
+          letterSpacing: -0.8,
+          color: textPrimary,
         ),
         headlineMedium: TextStyle(
-          fontFamily: 'Syne',
-          fontSize: 26,
+          fontSize: 28,
           fontWeight: FontWeight.w700,
-          letterSpacing: 0,
-          color: PulseColors.textPrimary,
+          letterSpacing: -0.6,
+          color: textPrimary,
+        ),
+        titleLarge: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          letterSpacing: -0.4,
+          color: textPrimary,
+        ),
+        titleMedium: TextStyle(
+          fontSize: 17,
+          fontWeight: FontWeight.w600,
+          letterSpacing: -0.3,
+          color: textPrimary,
         ),
         bodyLarge: TextStyle(
-          fontFamily: 'InstrumentSerif',
-          fontSize: 26,
-          height: 1.16,
-          letterSpacing: 0,
-          color: PulseColors.textPrimary,
+          fontSize: 17,
+          height: 1.35,
+          letterSpacing: -0.2,
+          color: textPrimary,
         ),
         bodyMedium: TextStyle(
-          fontFamily: 'InstrumentSerif',
-          fontSize: 20,
-          height: 1.25,
-          letterSpacing: 0,
-          color: PulseColors.textPrimary,
-        ),
-        labelLarge: TextStyle(
-          fontFamily: 'JetBrainsMono',
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 0,
-          color: PulseColors.textPrimary,
+          fontSize: 15,
+          height: 1.35,
+          letterSpacing: -0.1,
+          color: textPrimary,
         ),
         labelMedium: TextStyle(
-          fontFamily: 'JetBrainsMono',
-          fontSize: 11,
+          fontSize: 13,
           fontWeight: FontWeight.w500,
-          letterSpacing: 0,
-          color: PulseColors.textMuted,
+          color: textMuted,
         ),
-      ),
-      inputDecorationTheme: const InputDecorationTheme(
-        border: InputBorder.none,
-        isDense: true,
       ),
     );
   }
