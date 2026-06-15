@@ -9,6 +9,7 @@ public record PostResponse(
         String content,
         Instant createdAt,
         long likeCount,
-        long commentCount
+        long commentCount,
+        boolean likedByMe
 ) {
 }
