@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pulse/core/strings/app_strings.dart';
 import 'package:pulse/core/theme/pulse_colors.dart';
-import 'package:pulse/features/feed/feed_screen.dart';
 import 'package:pulse/core/theme/pulse_theme.dart';
 import 'package:pulse/core/di/app_scope.dart';
 import 'package:pulse/features/auth/auth_gate_screen.dart';
@@ -10,6 +9,7 @@ import 'package:pulse/features/auth/data/session_record.dart';
 import 'package:pulse/features/auth/login_screen.dart';
 import 'package:pulse/features/auth/register_screen.dart';
 import 'package:pulse/features/feed/compose_screen.dart';
+import 'package:pulse/features/feed/feed_screen.dart';
 import 'package:pulse/features/home/home_shell.dart';
 import 'package:pulse/features/home/welcome_screen.dart';
 import 'package:pulse/main.dart';
@@ -47,7 +47,7 @@ void main() {
     await pumpApp(tester);
 
     expect(find.text('Pulse'), findsOneWidget);
-    expect(find.text(AppStrings.welcomeTagline), findsOneWidget);
+    expect(find.text(AppStrings.welcomeMessage), findsOneWidget);
     expect(find.text('Get started'), findsOneWidget);
     expect(find.byType(WelcomeScreen), findsOneWidget);
   });
@@ -66,7 +66,12 @@ void main() {
     expect(AppStrings.welcomeMessage, 'Pulse — Sprint 0 skeleton');
     expect(AppStrings.feedTitle, 'Feed');
     expect(AppStrings.feedEmptyMessage, 'Der Feed ist leer.');
-    expect(AppStrings.feedEmptySubtext, 'Sobald neue Beiträge verfügbar sind, erscheinen sie hier.');
+    expect(
+      AppStrings.feedEmptySubtext,
+      'Sobald neue Beiträge verfügbar sind, erscheinen sie hier.',
+    );
+  });
+
   testWidgets('welcome routes to login', (tester) async {
     await pumpApp(tester);
 
@@ -122,7 +127,10 @@ void main() {
     await tester.pumpWidget(
       AppScope(
         dependencies: deps,
-        child: MaterialApp(theme: PulseTheme.light(), home: const HomeShell()),
+        child: MaterialApp(
+          theme: PulseTheme.light(),
+          home: const HomeShell(),
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -134,11 +142,6 @@ void main() {
 
     expect(find.byType(ComposeScreen), findsOneWidget);
     expect(find.text('New post'), findsOneWidget);
-  });
-
-  test('AppStrings expose Pulse copy', () {
-    expect(AppStrings.appName, 'Pulse');
-    expect(AppStrings.welcomeTagline, 'Social, simplified.');
   });
 
   test('PulseColors use muted coral accent', () {

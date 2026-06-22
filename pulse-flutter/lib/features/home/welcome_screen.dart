@@ -11,6 +11,8 @@ class WelcomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -27,14 +29,17 @@ class WelcomeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 32),
-              Text('Pulse', style: Theme.of(context).textTheme.displayMedium),
+              Text(
+                'Pulse',
+                style: theme.textTheme.displayMedium,
+              ),
               const SizedBox(height: 10),
               Text(
-                AppStrings.welcomeTagline,
+                AppStrings.welcomeMessage,
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).textTheme.labelMedium?.color,
-                    ),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.textTheme.labelMedium?.color,
+                ),
               ),
               const Spacer(),
               PulseButton(
