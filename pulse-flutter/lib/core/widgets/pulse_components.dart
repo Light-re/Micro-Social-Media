@@ -229,7 +229,7 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _LikeButton extends StatelessWidget {
+class _LikeButton extends StatefulWidget {
   const _LikeButton({
     required this.likeCount,
     required this.likedByMe,
@@ -245,24 +245,68 @@ class _LikeButton extends StatelessWidget {
   final VoidCallback? onTap;
 
   @override
+  State<_LikeButton> createState() => _LikeButtonState();
+}
+
+class _LikeButtonState extends State<_LikeButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 280),
+  );
+
+  late final Animation<double> _scale = TweenSequence<double>([
+    TweenSequenceItem(
+      tween: Tween<double>(begin: 1.0, end: 1.35)
+          .chain(CurveTween(curve: Curves.easeOut)),
+      weight: 45,
+    ),
+    TweenSequenceItem(
+      tween: Tween<double>(begin: 1.35, end: 1.0)
+          .chain(CurveTween(curve: Curves.easeInOutBack)),
+      weight: 55,
+    ),
+  ]).animate(_controller);
+
+  @override
+  void didUpdateWidget(covariant _LikeButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Pop the heart only on the unliked -> liked transition (US-17).
+    if (widget.likedByMe && !oldWidget.likedByMe) {
+      _controller.forward(from: 0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final liked = widget.likedByMe;
     return InkWell(
-      onTap: isInFlight ? null : onTap,
+      onTap: widget.isInFlight ? null : widget.onTap,
       borderRadius: BorderRadius.circular(8),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 4),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              likedByMe
-                  ? Icons.favorite_rounded
-                  : Icons.favorite_border_rounded,
-              size: 20,
-              color: PulseColors.coral.withValues(alpha: likedByMe ? 1 : 0.9),
+            ScaleTransition(
+              scale: _scale,
+              child: Icon(
+                liked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                size: 20,
+                color: PulseColors.coral.withValues(alpha: liked ? 1 : 0.9),
+              ),
             ),
             const SizedBox(width: 6),
-            Text(likeCount == 1 ? '1 like' : '$likeCount likes', style: muted),
+            Text(
+              widget.likeCount == 1 ? '1 like' : '${widget.likeCount} likes',
+              style: widget.muted,
+            ),
           ],
         ),
       ),

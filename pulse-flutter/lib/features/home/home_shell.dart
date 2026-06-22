@@ -14,6 +14,8 @@ class HomeShell extends StatefulWidget {
 
 class _HomeShellState extends State<HomeShell> {
   final GlobalKey<FeedScreenState> _feedKey = GlobalKey<FeedScreenState>();
+  final GlobalKey<ProfileScreenState> _profileKey =
+      GlobalKey<ProfileScreenState>();
   int _tab = 0;
 
   @override
@@ -23,7 +25,7 @@ class _HomeShellState extends State<HomeShell> {
         index: _tab,
         children: [
           FeedScreen(key: _feedKey),
-          const ProfileScreen(),
+          ProfileScreen(key: _profileKey),
         ],
       ),
       bottomNavigationBar: NavigationBar(
@@ -65,6 +67,7 @@ class _HomeShellState extends State<HomeShell> {
     );
     if (created == true) {
       await _feedKey.currentState?.reload();
+      await _profileKey.currentState?.reload();
     }
   }
 }

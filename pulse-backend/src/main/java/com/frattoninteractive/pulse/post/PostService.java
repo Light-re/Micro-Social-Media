@@ -10,6 +10,8 @@ public interface PostService {
 
     FeedResponse getFeed(String currentUserId);
 
+    FeedResponse getPostsByAuthor(String currentUserId, String authorId);
+
     void deleteOwnPost(String authorId, String postId);
 
     Post requirePost(String postId);

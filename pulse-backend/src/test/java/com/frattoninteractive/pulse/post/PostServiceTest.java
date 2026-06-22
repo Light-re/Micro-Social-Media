@@ -9,6 +9,8 @@ import com.frattoninteractive.pulse.user.User;
 import com.frattoninteractive.pulse.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.Instant;
 import java.util.List;
@@ -28,6 +30,7 @@ class PostServiceTest {
     private PostRepository postRepository;
     private UserService userService;
     private LikeRepository likeRepository;
+    private ApplicationEventPublisher eventPublisher;
     private PostService postService;
 
     @BeforeEach
@@ -35,7 +38,8 @@ class PostServiceTest {
         postRepository = mock(PostRepository.class);
         userService = mock(UserService.class);
         likeRepository = mock(LikeRepository.class);
-        postService = new PostServiceImpl(postRepository, userService, likeRepository);
+        eventPublisher = mock(ApplicationEventPublisher.class);
+        postService = new PostServiceImpl(postRepository, userService, likeRepository, eventPublisher);
     }
 
     @Test
@@ -63,6 +67,27 @@ class PostServiceTest {
     }
 
     @Test
+    void createPost_publishesPostCreatedEventForBroadcast() {
+        when(userService.findById("user-1")).thenReturn(User.builder()
+                .id("user-1")
+                .username("devuser")
+                .email("dev@pulse.test")
+                .build());
+        when(postRepository.save(any(Post.class))).thenAnswer(invocation -> {
+            Post post = invocation.getArgument(0);
+            post.setId("post-1");
+            return post;
+        });
+
+        postService.createPost("user-1", new CreatePostRequest("Live!"));
+
+        ArgumentCaptor<PostCreatedEvent> captor = ArgumentCaptor.forClass(PostCreatedEvent.class);
+        verify(eventPublisher).publishEvent(captor.capture());
+        assertThat(captor.getValue().post().id()).isEqualTo("post-1");
+        assertThat(captor.getValue().post().content()).isEqualTo("Live!");
+    }
+
+    @Test
     void getFeed_returnsPostsWithLikedByMeForCurrentUser() {
         Instant newer = Instant.parse("2026-06-15T12:00:00Z");
         Instant older = Instant.parse("2026-06-15T10:00:00Z");
@@ -81,6 +106,23 @@ class PostServiceTest {
         assertThat(feed.posts().getFirst().likedByMe()).isTrue();
         assertThat(feed.posts().getLast().id()).isEqualTo("p1");
         assertThat(feed.posts().getLast().likedByMe()).isFalse();
+    }
+
+    @Test
+    void getPostsByAuthor_returnsOnlyAuthorPostsWithLikedByMe() {
+        Instant created = Instant.parse("2026-06-15T12:00:00Z");
+        when(postRepository.findByAuthorIdOrderByCreatedAtDesc("user-1")).thenReturn(List.of(
+                Post.builder().id("p1").authorId("user-1").authorUsername("devuser").content("mine").createdAt(created).build()
+        ));
+        when(likeRepository.findByUserIdAndPostIdIn(eq("user-1"), any())).thenReturn(List.of(
+                Like.builder().id("like-1").postId("p1").userId("user-1").build()
+        ));
+
+        FeedResponse posts = postService.getPostsByAuthor("user-1", "user-1");
+
+        assertThat(posts.posts()).hasSize(1);
+        assertThat(posts.posts().getFirst().id()).isEqualTo("p1");
+        assertThat(posts.posts().getFirst().likedByMe()).isTrue();
     }
 
     @Test

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../core/di/app_scope.dart';
@@ -7,6 +9,7 @@ import '../auth/auth_service.dart';
 import '../like/like_service.dart';
 import 'data/post_response.dart';
 import 'feed_service.dart';
+import 'live_feed_service.dart';
 import 'widgets/post_tile.dart';
 
 class FeedScreen extends StatefulWidget {
@@ -20,6 +23,9 @@ class FeedScreenState extends State<FeedScreen> {
   late FeedService _feedService;
   late LikeService _likeService;
   late AuthService _authService;
+  late LiveFeedService _liveFeedService;
+  StreamSubscription<PostResponse>? _liveSubscription;
+  bool _liveWired = false;
 
   bool _isLoading = true;
   String? _error;
@@ -33,12 +39,35 @@ class FeedScreenState extends State<FeedScreen> {
     _feedService = deps.feedService;
     _likeService = deps.likeService;
     _authService = deps.authService;
+    _liveFeedService = deps.liveFeedService;
+    _wireLiveFeed();
   }
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => reload());
+  }
+
+  /// Subscribes to the realtime live feed once (US live feed). New posts from
+  /// other users are prepended without a manual reload; if the socket is down
+  /// the REST pull-to-refresh remains the fallback.
+  void _wireLiveFeed() {
+    if (_liveWired) return;
+    _liveWired = true;
+    _liveFeedService.connect();
+    _liveSubscription = _liveFeedService.posts.listen(_onLivePost);
+  }
+
+  void _onLivePost(PostResponse post) {
+    if (!mounted) return;
+    setState(() => _posts = LiveFeedService.merge(_posts, post));
+  }
+
+  @override
+  void dispose() {
+    _liveSubscription?.cancel();
+    super.dispose();
   }
 
   /// Reloads the feed (US-29 loading, US-14/15 rendering, error retry).

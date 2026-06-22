@@ -9,10 +9,16 @@ class FeedService {
 
   /// Loads the feed, defensively sorted newest-first (US-15).
   Future<List<PostResponse>> loadFeed() async {
-    final posts = await _postRepository.fetchFeed();
-    final sorted = [...posts]
-      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    return sorted;
+    return _sortedNewestFirst(await _postRepository.fetchFeed());
+  }
+
+  /// Loads the signed-in user's own posts, newest-first (US-09).
+  Future<List<PostResponse>> loadMyPosts() async {
+    return _sortedNewestFirst(await _postRepository.fetchMyPosts());
+  }
+
+  List<PostResponse> _sortedNewestFirst(List<PostResponse> posts) {
+    return [...posts]..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 
   Future<PostResponse> createPost(String content) {

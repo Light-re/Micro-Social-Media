@@ -39,6 +39,20 @@ void main() {
     expect(posts.first.id, 'post-1');
   });
 
+  test('fetchMyPosts hits /api/posts/me and parses posts', () async {
+    late Uri requested;
+    final repo = PostRepository(clientFor((request) async {
+      requested = request.url;
+      return http.Response('{"posts":[$_postJson]}', 200);
+    }));
+
+    final posts = await repo.fetchMyPosts();
+
+    expect(requested.path, '/api/posts/me');
+    expect(posts, hasLength(1));
+    expect(posts.first.id, 'post-1');
+  });
+
   test('createPost posts content and returns created post', () async {
     late String body;
     final repo = PostRepository(clientFor((request) async {
