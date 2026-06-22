@@ -1,5 +1,7 @@
 package com.frattoninteractive.pulse.post;
 
+import com.frattoninteractive.pulse.like.Like;
+import com.frattoninteractive.pulse.like.LikeRepository;
 import com.frattoninteractive.pulse.post.dto.CreatePostRequest;
 import com.frattoninteractive.pulse.post.dto.FeedResponse;
 import com.frattoninteractive.pulse.post.dto.PostResponse;
@@ -9,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +21,7 @@ public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
     private final UserService userService;
+    private final LikeRepository likeRepository;
 
     @Override
     public PostResponse createPost(String authorId, CreatePostRequest request) {
@@ -29,16 +35,16 @@ public class PostServiceImpl implements PostService {
                 .build();
 
         Post saved = postRepository.save(post);
-        return toResponse(saved);
+        return toResponse(saved, authorId);
     }
 
     @Override
-    public FeedResponse getFeed() {
-        return new FeedResponse(
-                postRepository.findAllByOrderByCreatedAtDesc().stream()
-                        .map(this::toResponse)
-                        .toList()
-        );
+    public FeedResponse getFeed(String currentUserId) {
+        List<Post> posts = postRepository.findAllByOrderByCreatedAtDesc();
+        Set<String> likedPostIds = likedPostIds(currentUserId, posts);
+        return new FeedResponse(posts.stream()
+                .map(post -> toResponse(post, likedPostIds.contains(post.getId())))
+                .toList());
     }
 
     @Override
@@ -53,7 +59,35 @@ public class PostServiceImpl implements PostService {
         postRepository.delete(post);
     }
 
-    private PostResponse toResponse(Post post) {
+    @Override
+    public Post requirePost(String postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException(postId));
+    }
+
+    @Override
+    public Post save(Post post) {
+        return postRepository.save(post);
+    }
+
+    @Override
+    public PostResponse toResponse(Post post, String currentUserId) {
+        boolean likedByMe = currentUserId != null
+                && likeRepository.existsByPostIdAndUserId(post.getId(), currentUserId);
+        return toResponse(post, likedByMe);
+    }
+
+    private Set<String> likedPostIds(String currentUserId, List<Post> posts) {
+        if (currentUserId == null || posts.isEmpty()) {
+            return Set.of();
+        }
+        List<String> postIds = posts.stream().map(Post::getId).toList();
+        return likeRepository.findByUserIdAndPostIdIn(currentUserId, postIds).stream()
+                .map(Like::getPostId)
+                .collect(Collectors.toSet());
+    }
+
+    private PostResponse toResponse(Post post, boolean likedByMe) {
         return new PostResponse(
                 post.getId(),
                 post.getAuthorId(),
@@ -61,7 +95,8 @@ public class PostServiceImpl implements PostService {
                 post.getContent(),
                 post.getCreatedAt(),
                 post.getLikeCount(),
-                post.getCommentCount()
+                post.getCommentCount(),
+                likedByMe
         );
     }
 }

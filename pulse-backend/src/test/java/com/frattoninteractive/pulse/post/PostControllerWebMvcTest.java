@@ -48,7 +48,7 @@ class PostControllerWebMvcTest {
     @Test
     void createPost_returnsCreatedPost() throws Exception {
         when(postService.createPost(eq("user-1"), any(CreatePostRequest.class))).thenReturn(
-                new PostResponse("post-1", "user-1", "devuser", "Hello", Instant.parse("2026-06-15T10:00:00Z"), 0, 0)
+                new PostResponse("post-1", "user-1", "devuser", "Hello", Instant.parse("2026-06-15T10:00:00Z"), 0, 0, false)
         );
 
         mockMvc.perform(post("/api/posts")
@@ -62,9 +62,9 @@ class PostControllerWebMvcTest {
 
     @Test
     void getFeed_returnsSortedPosts() throws Exception {
-        when(postService.getFeed()).thenReturn(new FeedResponse(List.of(
-                new PostResponse("post-2", "user-1", "devuser", "new", Instant.parse("2026-06-15T12:00:00Z"), 1, 0),
-                new PostResponse("post-1", "user-1", "devuser", "old", Instant.parse("2026-06-15T10:00:00Z"), 0, 2)
+        when(postService.getFeed("user-1")).thenReturn(new FeedResponse(List.of(
+                new PostResponse("post-2", "user-1", "devuser", "new", Instant.parse("2026-06-15T12:00:00Z"), 1, 0, true),
+                new PostResponse("post-1", "user-1", "devuser", "old", Instant.parse("2026-06-15T10:00:00Z"), 0, 2, false)
         )));
 
         mockMvc.perform(get("/api/posts/feed")

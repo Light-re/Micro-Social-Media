@@ -55,13 +55,12 @@ jobs:
         working-directory: pulse-backend
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Skip backend checks
         if: needs.changes.outputs.backend != 'true' && needs.changes.outputs.shared != 'true'
         run: echo "No backend changes in this commit."
-
-      - name: Checkout
-        if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true'
-        uses: actions/checkout@v4
 
       - name: Set up Java 21
         if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true'
@@ -94,13 +93,12 @@ jobs:
         working-directory: pulse-flutter
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Skip flutter checks
         if: needs.changes.outputs.flutter != 'true' && needs.changes.outputs.shared != 'true'
         run: echo "No flutter changes in this commit."
-
-      - name: Checkout
-        if: needs.changes.outputs.flutter == 'true' || needs.changes.outputs.shared == 'true'
-        uses: actions/checkout@v4
 
       - name: Set up Flutter
         if: needs.changes.outputs.flutter == 'true' || needs.changes.outputs.shared == 'true'

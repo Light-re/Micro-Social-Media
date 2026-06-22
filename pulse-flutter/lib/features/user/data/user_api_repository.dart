@@ -1,6 +1,5 @@
-import 'dart:convert';
-
 import '../../../core/network/api_client.dart';
+import '../../../core/network/api_exception.dart';
 import 'user_profile.dart';
 
 class UserApiException implements Exception {
@@ -12,52 +11,34 @@ class UserApiException implements Exception {
   String toString() => message;
 }
 
-/// REST access for `/api/users` endpoints.
+/// REST access for `/api/users` endpoints. The bearer token is injected by the
+/// shared [ApiClient], so callers do not pass it explicitly.
 class UserApiRepository {
   UserApiRepository(this._apiClient);
 
   final ApiClient _apiClient;
 
-  Future<UserProfile> fetchMe(String token) async {
-    final response = await _apiClient.get('/api/users/me', token: token);
-    return _parseProfile(response);
+  Future<UserProfile> fetchMe() async {
+    try {
+      final json = await _apiClient.get('/api/users/me');
+      return UserProfile.fromJson(json as Map<String, dynamic>);
+    } on ApiException catch (error) {
+      throw UserApiException(error.message);
+    }
   }
 
   Future<UserProfile> updateMe({
-    required String token,
     required String username,
     required String bio,
   }) async {
-    final response = await _apiClient.put(
-      '/api/users/me',
-      token: token,
-      body: {
-        'username': username,
-        'bio': bio,
-      },
-    );
-    return _parseProfile(response);
-  }
-
-  UserProfile _parseProfile(dynamic response) {
-    if (response.statusCode == 200) {
-      final json = jsonDecode(response.body) as Map<String, dynamic>;
-      return UserProfile.fromJson(json);
-    }
-
-    throw UserApiException(_readError(response));
-  }
-
-  String _readError(dynamic response) {
     try {
-      final json = jsonDecode(response.body) as Map<String, dynamic>;
-      final detail = json['detail'];
-      if (detail is String && detail.isNotEmpty) {
-        return detail;
-      }
-    } catch (_) {
-      // Fall through to generic message.
+      final json = await _apiClient.put(
+        '/api/users/me',
+        body: {'username': username, 'bio': bio},
+      );
+      return UserProfile.fromJson(json as Map<String, dynamic>);
+    } on ApiException catch (error) {
+      throw UserApiException(error.message);
     }
-    return 'Profile request failed (${response.statusCode})';
   }
 }

@@ -11,8 +11,8 @@ class UserService {
   final SessionRepository _sessionRepository;
 
   Future<UserProfile> loadProfile() async {
-    final session = await _requireSession();
-    return _userApiRepository.fetchMe(session.token);
+    await _requireSession();
+    return _userApiRepository.fetchMe();
   }
 
   Future<UserProfile> updateProfile({
@@ -21,7 +21,6 @@ class UserService {
   }) async {
     final session = await _requireSession();
     final profile = await _userApiRepository.updateMe(
-      token: session.token,
       username: username,
       bio: bio,
     );

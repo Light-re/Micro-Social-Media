@@ -34,8 +34,8 @@ public class PostController {
     }
 
     @GetMapping("/feed")
-    public FeedResponse getFeed() {
-        return postService.getFeed();
+    public FeedResponse getFeed(@AuthenticationPrincipal JwtPrincipal principal) {
+        return postService.getFeed(principal.userId());
     }
 
     @DeleteMapping("/{postId}")
