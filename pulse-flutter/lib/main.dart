@@ -24,7 +24,7 @@ class PulseApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: PulseTheme.light(),
         darkTheme: PulseTheme.dark(),
-        themeMode: ThemeMode.system,
+        themeMode: ThemeMode.light,
         home: const AuthGateScreen(),
       ),
     );

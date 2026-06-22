@@ -21,13 +21,9 @@ class _HomeShellState extends State<HomeShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _tab,
-        children: [
-          FeedScreen(key: _feedKey),
-          ProfileScreen(key: _profileKey),
-        ],
-      ),
+      body: _tab == 0
+          ? FeedScreen(key: _feedKey)
+          : ProfileScreen(key: _profileKey),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _tab == 0 ? 0 : 2,
         onDestinationSelected: (index) {
