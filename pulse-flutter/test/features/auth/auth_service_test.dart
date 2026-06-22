@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -46,6 +48,25 @@ void main() {
     expect(await service.currentUserId(), 'user-1');
     final session = await service.currentSession();
     expect(session?.username, 'devuser');
+  });
+
+  test('login surfaces network errors from transport failures', () async {
+    final service = buildService(
+      (_) async => throw const SocketException('down'),
+      sessionRepository,
+    );
+
+    await expectLater(
+      service.login(email: 'dev@pulse.test', password: 'secret123'),
+      throwsA(
+        isA<AuthApiException>().having(
+          (e) => e.message,
+          'message',
+          contains('connection'),
+        ),
+      ),
+    );
+    expect(await service.currentUserId(), isNull);
   });
 
   test('login surfaces AuthApiException and stores nothing on failure', () async {
