@@ -4,6 +4,8 @@ import 'package:pulse/core/strings/app_strings.dart';
 import 'package:pulse/core/theme/pulse_colors.dart';
 import 'package:pulse/core/theme/pulse_theme.dart';
 import 'package:pulse/core/di/app_scope.dart';
+import 'package:pulse/features/auth/auth_gate_screen.dart';
+import 'package:pulse/features/auth/data/session_record.dart';
 import 'package:pulse/features/auth/login_screen.dart';
 import 'package:pulse/features/auth/register_screen.dart';
 import 'package:pulse/features/feed/compose_screen.dart';
@@ -14,6 +16,26 @@ import 'package:pulse/main.dart';
 import 'support/test_dependencies.dart';
 
 void main() {
+  Future<void> pumpApp(WidgetTester tester, {SessionRecord? session}) async {
+    await tester.pumpWidget(
+      PulseApp(
+        dependencies: buildTestDependencies(
+          (_) async => jsonResponse('{}'),
+          session: session,
+        ),
+      ),
+    );
+    await tester.pump();
+    for (var attempt = 0; attempt < 20; attempt++) {
+      await tester.pump(const Duration(milliseconds: 50));
+      if (find.byType(WelcomeScreen).evaluate().isNotEmpty ||
+          find.byType(HomeShell).evaluate().isNotEmpty) {
+        return;
+      }
+    }
+    fail('Auth gate did not resolve');
+  }
+
   PulseApp buildApp() {
     return PulseApp(
       dependencies: buildTestDependencies((_) async => jsonResponse('{}')),
@@ -21,7 +43,7 @@ void main() {
   }
 
   testWidgets('shows Pulse welcome screen', (tester) async {
-    await tester.pumpWidget(buildApp());
+    await pumpApp(tester);
 
     expect(find.text('Pulse'), findsOneWidget);
     expect(find.text(AppStrings.welcomeTagline), findsOneWidget);
@@ -30,7 +52,7 @@ void main() {
   });
 
   testWidgets('welcome routes to login', (tester) async {
-    await tester.pumpWidget(buildApp());
+    await pumpApp(tester);
 
     await tester.tap(find.text('Get started'));
     await tester.pumpAndSettle();
@@ -40,13 +62,37 @@ void main() {
   });
 
   testWidgets('welcome routes to register', (tester) async {
-    await tester.pumpWidget(buildApp());
+    await pumpApp(tester);
 
     await tester.tap(find.text('Create account'));
     await tester.pumpAndSettle();
 
     expect(find.byType(RegisterScreen), findsOneWidget);
     expect(find.text('Join Pulse'), findsOneWidget);
+  });
+
+  testWidgets('login routes to register from sign-in screen', (tester) async {
+    await pumpApp(tester);
+
+    await tester.tap(find.text('Get started'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Create account'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(RegisterScreen), findsOneWidget);
+  });
+
+  testWidgets('app starts with auth gate', (tester) async {
+    await tester.pumpWidget(buildApp());
+    expect(find.byType(AuthGateScreen), findsOneWidget);
+    await tester.pump();
+    for (var attempt = 0; attempt < 20; attempt++) {
+      await tester.pump(const Duration(milliseconds: 50));
+      if (find.byType(WelcomeScreen).evaluate().isNotEmpty) {
+        return;
+      }
+    }
+    fail('Auth gate did not resolve to welcome');
   });
 
   testWidgets('home shell opens compose from tab bar', (tester) async {

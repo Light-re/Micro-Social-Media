@@ -4,7 +4,7 @@ import 'core/di/app_dependencies.dart';
 import 'core/di/app_scope.dart';
 import 'core/strings/app_strings.dart';
 import 'core/theme/pulse_theme.dart';
-import 'features/home/welcome_screen.dart';
+import 'features/auth/auth_gate_screen.dart';
 
 void main() {
   runApp(PulseApp(dependencies: AppDependencies.create()));
@@ -25,7 +25,7 @@ class PulseApp extends StatelessWidget {
         theme: PulseTheme.light(),
         darkTheme: PulseTheme.dark(),
         themeMode: ThemeMode.system,
-        home: const WelcomeScreen(),
+        home: const AuthGateScreen(),
       ),
     );
   }
