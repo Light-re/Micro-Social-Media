@@ -38,6 +38,11 @@ public class PostController {
         return postService.getFeed(principal.userId());
     }
 
+    @GetMapping("/me")
+    public FeedResponse getMyPosts(@AuthenticationPrincipal JwtPrincipal principal) {
+        return postService.getPostsByAuthor(principal.userId(), principal.userId());
+    }
+
     @DeleteMapping("/{postId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteOwnPost(

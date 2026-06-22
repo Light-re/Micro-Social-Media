@@ -8,6 +8,7 @@ import com.frattoninteractive.pulse.post.dto.PostResponse;
 import com.frattoninteractive.pulse.user.User;
 import com.frattoninteractive.pulse.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -22,6 +23,7 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final UserService userService;
     private final LikeRepository likeRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public PostResponse createPost(String authorId, CreatePostRequest request) {
@@ -35,12 +37,22 @@ public class PostServiceImpl implements PostService {
                 .build();
 
         Post saved = postRepository.save(post);
-        return toResponse(saved, authorId);
+        PostResponse response = toResponse(saved, authorId);
+        eventPublisher.publishEvent(new PostCreatedEvent(response));
+        return response;
     }
 
     @Override
     public FeedResponse getFeed(String currentUserId) {
-        List<Post> posts = postRepository.findAllByOrderByCreatedAtDesc();
+        return toFeed(postRepository.findAllByOrderByCreatedAtDesc(), currentUserId);
+    }
+
+    @Override
+    public FeedResponse getPostsByAuthor(String currentUserId, String authorId) {
+        return toFeed(postRepository.findByAuthorIdOrderByCreatedAtDesc(authorId), currentUserId);
+    }
+
+    private FeedResponse toFeed(List<Post> posts, String currentUserId) {
         Set<String> likedPostIds = likedPostIds(currentUserId, posts);
         return new FeedResponse(posts.stream()
                 .map(post -> toResponse(post, likedPostIds.contains(post.getId())))

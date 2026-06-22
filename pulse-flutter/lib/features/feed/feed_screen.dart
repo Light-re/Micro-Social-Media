@@ -1,49 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../core/strings/app_strings.dart';
 import '../../core/theme/pulse_colors.dart';
-
-class FeedPost {
-  const FeedPost({
-    required this.username,
-    required this.displayName,
-    required this.timestamp,
-    required this.text,
-    required this.likeCount,
-  });
-
-  final String username;
-  final String displayName;
-  final String timestamp;
-  final String text;
-  final int likeCount;
-}
-
-const _demoPosts = [
-  FeedPost(
-    username: 'mira',
-    displayName: 'Mira',
-    timestamp: '2h ago',
-    text:
-        'The room went quiet and somehow that felt like everyone replying at once.',
-    likeCount: 12,
-  ),
-  FeedPost(
-    username: 'noah',
-    displayName: 'Noah',
-    timestamp: '18m ago',
-    text:
-        'Caught the tram home with rain on the glass. Small city, loud chest.',
-    likeCount: 8,
-  ),
-  FeedPost(
-    username: 'sana',
-    displayName: 'Sana',
-    timestamp: 'Just now',
-    text: 'Send me the songs that make the evening less rectangular.',
-    likeCount: 21,
-  ),
-];
+import '../auth/auth_service.dart';
+import '../like/like_service.dart';
+import 'data/post_response.dart';
+import 'feed_service.dart';
+import 'live_feed_service.dart';
+import 'widgets/post_tile.dart';
 
 class FeedScreen extends StatefulWidget {
   const FeedScreen({
@@ -58,7 +24,28 @@ class FeedScreen extends StatefulWidget {
 }
 
 class FeedScreenState extends State<FeedScreen> {
-  late List<FeedPost> _displayPosts;
+  late FeedService _feedService;
+  late LikeService _likeService;
+  late AuthService _authService;
+  late LiveFeedService _liveFeedService;
+  StreamSubscription<PostResponse>? _liveSubscription;
+  bool _liveWired = false;
+
+  bool _isLoading = true;
+  String? _error;
+  List<PostResponse> _posts = const [];
+  String? _currentUserId;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final deps = AppScope.of(context);
+    _feedService = deps.feedService;
+    _likeService = deps.likeService;
+    _authService = deps.authService;
+    _liveFeedService = deps.liveFeedService;
+    _wireLiveFeed();
+  }
 
   @override
   void initState() {
@@ -66,10 +53,57 @@ class FeedScreenState extends State<FeedScreen> {
     _displayPosts = widget.posts.isEmpty ? _demoPosts : widget.posts;
   }
 
+  /// Subscribes to the realtime live feed once (US live feed). New posts from
+  /// other users are prepended without a manual reload; if the socket is down
+  /// the REST pull-to-refresh remains the fallback.
+  void _wireLiveFeed() {
+    if (_liveWired) return;
+    _liveWired = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _liveFeedService.connect();
+      _liveSubscription = _liveFeedService.posts.listen(_onLivePost);
+    });
+  }
+
+  void _onLivePost(PostResponse post) {
+    if (!mounted) return;
+    setState(() => _posts = LiveFeedService.merge(_posts, post));
+  }
+
+  @override
+  void dispose() {
+    _liveSubscription?.cancel();
+    super.dispose();
+  }
+
+  /// Reloads the feed (US-29 loading, US-14/15 rendering, error retry).
   Future<void> reload() async {
     setState(() {
       _displayPosts = widget.posts.isEmpty ? _demoPosts : widget.posts;
     });
+    try {
+      final userId = await _authService.currentUserId();
+      final posts = await _feedService.loadFeed();
+      if (!mounted) return;
+      setState(() {
+        _currentUserId = userId;
+        _posts = posts;
+        _isLoading = false;
+      });
+    } on ApiException catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _error = error.message;
+        _isLoading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _error = 'Could not load feed.';
+        _isLoading = false;
+      });
+    }
   }
 
   @override

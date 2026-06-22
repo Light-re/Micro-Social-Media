@@ -49,4 +49,44 @@ void main() {
 
     expect(find.byIcon(Icons.more_horiz_rounded), findsNothing);
   });
+
+  testWidgets('tapping like fills the heart and pops (US-17)', (tester) async {
+    final deps = buildTestDependencies((request) async {
+      if (request.method == 'POST' &&
+          request.url.path == '/api/posts/post-1/like') {
+        return jsonResponse(
+          '{"id":"post-1","authorId":"user-1","authorUsername":"devuser",'
+          '"content":"Hello","createdAt":"2026-06-15T10:00:00.000Z",'
+          '"likeCount":1,"commentCount":0,"likedByMe":true}',
+        );
+      }
+      return jsonResponse('{}');
+    });
+
+    await tester.pumpWidget(
+      AppScope(
+        dependencies: deps,
+        child: MaterialApp(
+          home: Scaffold(
+            body: PostTile(
+              post: buildPost(),
+              likeService: deps.likeService,
+              currentUserId: 'user-1',
+              onDeleteRequested: (_) async {},
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byIcon(Icons.favorite_border_rounded), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.favorite_border_rounded));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.byIcon(Icons.favorite_rounded), findsOneWidget);
+    expect(find.text('1 like'), findsOneWidget);
+    await tester.pumpAndSettle();
+  });
 }

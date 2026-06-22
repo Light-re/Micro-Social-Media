@@ -9,4 +9,10 @@ abstract final class ApiConfig {
   /// Base URL used by the app at runtime. Defaults to the Android emulator
   /// loopback so the bundled debug build reaches a backend on the host.
   static const String baseUrl = emulatorBaseUrl;
+
+  /// STOMP-over-WebSocket endpoint for the live feed, derived from [baseUrl]
+  /// (http -> ws). For the emulator this resolves to
+  /// `ws://10.0.2.2:8080/ws`.
+  static String get webSocketUrl =>
+      '${baseUrl.replaceFirst('http', 'ws')}/ws';
 }

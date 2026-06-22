@@ -22,7 +22,8 @@ class ApiException implements Exception {
   static String _messageFor(int statusCode, String body) {
     return switch (statusCode) {
       400 || 409 => _extractMessage(body) ?? 'That request could not be processed.',
-      401 => 'Your session has expired. Please sign in again.',
+      401 => _extractMessage(body) ??
+          'Your session has expired. Please sign in again.',
       403 => 'You do not have permission to do that.',
       404 => 'We could not find what you were looking for.',
       >= 500 => 'Something went wrong on our end. Please try again.',
