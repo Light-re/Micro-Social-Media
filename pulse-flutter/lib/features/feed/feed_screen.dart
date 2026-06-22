@@ -55,8 +55,11 @@ class FeedScreenState extends State<FeedScreen> {
   void _wireLiveFeed() {
     if (_liveWired) return;
     _liveWired = true;
-    _liveFeedService.connect();
-    _liveSubscription = _liveFeedService.posts.listen(_onLivePost);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _liveFeedService.connect();
+      _liveSubscription = _liveFeedService.posts.listen(_onLivePost);
+    });
   }
 
   void _onLivePost(PostResponse post) {
@@ -89,6 +92,12 @@ class FeedScreenState extends State<FeedScreen> {
       if (!mounted) return;
       setState(() {
         _error = error.message;
+        _isLoading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _error = 'Could not load feed.';
         _isLoading = false;
       });
     }

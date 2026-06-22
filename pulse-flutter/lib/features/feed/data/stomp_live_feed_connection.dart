@@ -40,19 +40,23 @@ class StompLiveFeedConnection implements LiveFeedConnection {
   }
 
   Future<void> _start() async {
-    final token = await tokenProvider();
-    final headers = <String, String>{};
-    if (token != null && token.isNotEmpty) {
-      headers['Authorization'] = 'Bearer $token';
+    try {
+      final token = await tokenProvider();
+      final headers = <String, String>{};
+      if (token != null && token.isNotEmpty) {
+        headers['Authorization'] = 'Bearer $token';
+      }
+      _client = _clientFactory(StompConfig(
+        url: url,
+        stompConnectHeaders: headers,
+        onConnect: _onConnect,
+        onWebSocketError: (_) {},
+        onStompError: (_) {},
+      ))
+        ..activate();
+    } catch (_) {
+      // Socket unavailable; REST feed remains the fallback.
     }
-    _client = _clientFactory(StompConfig(
-      url: url,
-      stompConnectHeaders: headers,
-      onConnect: _onConnect,
-      onWebSocketError: (_) {},
-      onStompError: (_) {},
-    ))
-      ..activate();
   }
 
   void _onConnect(StompFrame frame) {
