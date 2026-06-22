@@ -5,6 +5,7 @@ import '../../core/widgets/pulse_components.dart';
 import '../home/home_shell.dart';
 import 'auth_service.dart';
 import 'data/auth_api_repository.dart';
+import 'register_screen.dart';
 import 'validators/form_validators.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -126,6 +127,19 @@ class _LoginScreenState extends State<LoginScreen> {
                 PulseButton(
                   label: _isSubmitting ? 'Signing in…' : 'Sign in',
                   onPressed: _isSubmitting ? null : _submit,
+                ),
+                const SizedBox(height: 12),
+                TextButton(
+                  onPressed: _isSubmitting
+                      ? null
+                      : () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => const RegisterScreen(),
+                            ),
+                          );
+                        },
+                  child: const Text('Create account'),
                 ),
               ],
             ),

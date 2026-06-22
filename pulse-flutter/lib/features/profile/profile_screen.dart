@@ -2,15 +2,19 @@ import 'package:flutter/material.dart';
 
 import '../../core/di/app_scope.dart';
 import '../../core/widgets/pulse_components.dart';
+import '../../core/network/api_exception.dart';
+import '../auth/auth_service.dart';
+import '../auth/login_screen.dart';
 import '../user/data/user_api_repository.dart';
 import '../user/data/user_profile.dart';
 import '../user/user_service.dart';
 import 'edit_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key, this.userService});
+  const ProfileScreen({super.key, this.userService, this.authService});
 
   final UserService? userService;
+  final AuthService? authService;
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -18,6 +22,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   late final UserService _userService;
+  late final AuthService _authService;
   bool _servicesResolved = false;
   UserProfile? _profile;
   bool _isLoading = true;
@@ -30,7 +35,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
     _servicesResolved = true;
-    _userService = widget.userService ?? AppScope.of(context).userService;
+    final scope = AppScope.of(context);
+    _userService = widget.userService ?? scope.userService;
+    _authService = widget.authService ?? scope.authService;
     _loadProfile();
   }
 
@@ -58,6 +65,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _isLoading = false;
       });
     } on UserApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _errorMessage = error.message;
+        _isLoading = false;
+      });
+    } on ApiException catch (error) {
       if (!mounted) {
         return;
       }
@@ -96,6 +111,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> _logout() async {
+    await _authService.logout();
+    if (!mounted) {
+      return;
+    }
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute<void>(builder: (_) => const LoginScreen()),
+      (_) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -108,6 +134,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               icon: const Icon(Icons.edit_outlined),
               tooltip: 'Edit profile',
             ),
+          IconButton(
+            onPressed: _logout,
+            icon: const Icon(Icons.logout),
+            tooltip: 'Log out',
+          ),
         ],
       ),
       body: _buildBody(),
