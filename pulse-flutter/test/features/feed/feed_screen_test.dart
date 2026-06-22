@@ -47,6 +47,26 @@ void main() {
     expect(find.text('Hello from the feed'), findsOneWidget);
   });
 
+  testWidgets('shows empty state when feed has no posts', (tester) async {
+    final deps = buildTestDependencies((request) async {
+      if (request.url.path == '/api/posts/feed') {
+        return jsonResponse('{"posts":[]}');
+      }
+      return jsonResponse('{}', status: 404);
+    });
+
+    await tester.pumpWidget(
+      AppScope(
+        dependencies: deps,
+        child: const MaterialApp(home: FeedScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Nothing here yet.'), findsOneWidget);
+    expect(find.byType(PostTile), findsNothing);
+  });
+
   testWidgets('shows an error state with retry when loading fails',
       (tester) async {
     final deps = buildTestDependencies((_) async => jsonResponse('', status: 500));
