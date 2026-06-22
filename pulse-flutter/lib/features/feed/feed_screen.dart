@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../core/strings/app_strings.dart';
 import '../../core/theme/pulse_colors.dart';
-import '../../core/widgets/pulse_components.dart';
 
 class FeedPost {
   const FeedPost({
@@ -46,7 +45,7 @@ const _demoPosts = [
   ),
 ];
 
-class FeedScreen extends StatelessWidget {
+class FeedScreen extends StatefulWidget {
   const FeedScreen({
     super.key,
     this.posts = const [],
@@ -55,9 +54,26 @@ class FeedScreen extends StatelessWidget {
   final List<FeedPost> posts;
 
   @override
-  Widget build(BuildContext context) {
-    final effectivePosts = posts.isEmpty ? _demoPosts : posts;
+  State<FeedScreen> createState() => FeedScreenState();
+}
 
+class FeedScreenState extends State<FeedScreen> {
+  late List<FeedPost> _displayPosts;
+
+  @override
+  void initState() {
+    super.initState();
+    _displayPosts = widget.posts.isEmpty ? _demoPosts : widget.posts;
+  }
+
+  Future<void> reload() async {
+    setState(() {
+      _displayPosts = widget.posts.isEmpty ? _demoPosts : widget.posts;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: PulseColors.lightBackground,
       appBar: AppBar(
@@ -67,9 +83,9 @@ class FeedScreen extends StatelessWidget {
       ),
       body: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        itemCount: effectivePosts.length,
+        itemCount: _displayPosts.length,
         itemBuilder: (context, index) {
-          final post = effectivePosts[index];
+          final post = _displayPosts[index];
 
           return Container(
             margin: const EdgeInsets.only(bottom: 16),
