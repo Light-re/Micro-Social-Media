@@ -46,6 +46,21 @@ class LikeServiceTest {
     }
 
     @Test
+    void like_allowsUserToLikeOwnPost() {
+        Post post = postWithAuthorAndLikes("user-1", 0);
+        when(postService.requirePost("post-1")).thenReturn(post);
+        when(likeRepository.existsByPostIdAndUserId("post-1", "user-1")).thenReturn(false);
+        when(postService.toResponse(post, "user-1")).thenReturn(response(1, true));
+
+        PostResponse response = likeService.like("user-1", "post-1");
+
+        verify(likeRepository).save(any(Like.class));
+        verify(postService).save(post);
+        assertThat(post.getLikeCount()).isEqualTo(1);
+        assertThat(response.likedByMe()).isTrue();
+    }
+
+    @Test
     void like_isIdempotentWhenAlreadyLiked() {
         Post post = postWithLikes(5);
         when(postService.requirePost("post-1")).thenReturn(post);
@@ -95,7 +110,11 @@ class LikeServiceTest {
     }
 
     private Post postWithLikes(long likeCount) {
-        return Post.builder().id("post-1").authorId("u1").likeCount(likeCount).build();
+        return postWithAuthorAndLikes("u1", likeCount);
+    }
+
+    private Post postWithAuthorAndLikes(String authorId, long likeCount) {
+        return Post.builder().id("post-1").authorId(authorId).likeCount(likeCount).build();
     }
 
     private PostResponse response(long likeCount, boolean likedByMe) {

@@ -77,6 +77,42 @@ Wichtige Dokumente:
 - `docs/Architektur/Service-Mermaid-Diagramm.md`
 - `docs/GitHub/GitHub-Issues.md`
 
+## App-Screenshots und Funktionsdokumentation
+
+Die folgenden Screenshots dokumentieren den aktuellen Stand der Flutter-App im Emulator. Sie zeigen den wichtigsten Benutzerfluss von der Registrierung und Anmeldung bis zum Feed, Kommentieren und Bearbeiten des eigenen Profils.
+
+### Authentifizierung
+
+Die App startet für nicht angemeldete Benutzer mit dem Login-Screen. Bestehende Benutzer können sich mit E-Mail und Passwort anmelden. Über den Link **Create account** gelangt man zur Registrierung.
+
+<img src="docs/Screenshots/Screenshot%202026-06-22%20114133.png" width="260" alt="Login-Screen mit E-Mail- und Passwortfeld">
+<img src="docs/Screenshots/Screenshot%202026-06-22%20115401.png" width="260" alt="Leerer Login-Screen">
+<img src="docs/Screenshots/Screenshot%202026-06-22%20115424.png" width="260" alt="Registrierungs-Screen">
+
+Beim Registrieren werden E-Mail, Benutzername und Passwort erfasst. Nach erfolgreicher Anmeldung wird der JWT-Token vom Client verwendet, um geschützte Backend-Endpunkte wie Feed, Profil, Likes und Kommentare aufzurufen.
+
+### Feed, Likes und Kommentare
+
+Der Feed zeigt Posts aller Benutzer in einer chronologischen Kartenansicht. Jeder Post enthält Avatar, Anzeigename, Benutzername, Zeitangabe, Inhalt sowie die Anzahl der Likes und Kommentare. Die untere Navigation verbindet die Hauptbereiche **Feed**, **Post** und **Profile**.
+
+<img src="docs/Screenshots/Screenshot%202026-06-22%20114920.png" width="260" alt="Pulse Feed mit mehreren Posts">
+<img src="docs/Screenshots/Screenshot%202026-06-22%20115121.png" width="260" alt="Feed nach erstelltem Test-Post">
+
+Über das Herzsymbol können Beiträge geliked werden. Das Kommentarsymbol öffnet die Kommentaransicht. Dort wird angezeigt, ob bereits Kommentare vorhanden sind, und am unteren Rand befindet sich das Eingabefeld zum Erstellen eines neuen Kommentars.
+
+<img src="docs/Screenshots/Screenshot%202026-06-22%20115000.png" width="260" alt="Leere Kommentaransicht">
+<img src="docs/Screenshots/Screenshot%202026-06-22%20115037.png" width="260" alt="Kommentaransicht mit einem Kommentar">
+
+### Profil und Profilbearbeitung
+
+Im Profil sieht der angemeldete Benutzer seine Profildaten und die eigenen Posts. Der Screen enthält zusätzlich Aktionen zum Bearbeiten des Profils und zum Abmelden.
+
+<img src="docs/Screenshots/Screenshot%202026-06-22%20115246.png" width="260" alt="Profilansicht mit eigenem Post">
+
+In der Profilbearbeitung können Benutzername und Bio angepasst werden. Die Änderungen werden über **Save changes** gespeichert und danach im Profil angezeigt.
+
+<img src="docs/Screenshots/Screenshot%202026-06-22%20115330.png" width="260" alt="Profil bearbeiten mit Username und Bio">
+
 ## MVP
 
 Der Fokus liegt auf einer stabilen, einfachen und präsentierbaren App. Reels, komplexe Story-Funktionen, Live-Chat, Push Notifications und grosse Zusatzfeatures werden nur umgesetzt, wenn nach dem MVP noch genügend Zeit bleibt.

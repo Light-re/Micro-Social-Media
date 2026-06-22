@@ -65,6 +65,21 @@ void main() {
     );
   });
 
+  test('uses backend detail for 403 permission messages', () async {
+    final client = buildClient(
+      (_) async => http.Response('{"detail":"Only the author can delete this post."}', 403),
+    );
+
+    await expectLater(
+      client.delete('/api/posts/1'),
+      throwsA(
+        isA<ApiException>()
+            .having((e) => e.statusCode, 'statusCode', 403)
+            .having((e) => e.message, 'message', 'Only the author can delete this post.'),
+      ),
+    );
+  });
+
   test('maps transport failures to a network message', () async {
     final client = buildClient((_) async => throw const SocketException('down'));
 
