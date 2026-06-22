@@ -110,8 +110,12 @@ class _CommentsScreenState extends State<CommentsScreen> {
                 enabled: !_isSending,
                 minLines: 1,
                 maxLines: 4,
+                maxLength: 500,
                 onChanged: (_) => setState(() {}),
-                decoration: const InputDecoration(hintText: 'Add a comment'),
+                decoration: const InputDecoration(
+                  hintText: 'Add a comment',
+                  counterText: '',
+                ),
               ),
             ),
             const SizedBox(width: 8),

@@ -13,6 +13,11 @@ class PostRepository {
     return FeedResponse.fromJson(data as Map<String, dynamic>).posts;
   }
 
+  Future<List<PostResponse>> fetchMyPosts() async {
+    final data = await _apiClient.get('/api/posts/me');
+    return FeedResponse.fromJson(data as Map<String, dynamic>).posts;
+  }
+
   Future<PostResponse> createPost(String content) async {
     final data = await _apiClient.post('/api/posts', body: {'content': content});
     return PostResponse.fromJson(data as Map<String, dynamic>);

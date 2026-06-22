@@ -75,6 +75,30 @@ class PostControllerWebMvcTest {
     }
 
     @Test
+    void getMyPosts_returnsAuthorPosts() throws Exception {
+        when(postService.getPostsByAuthor("user-1", "user-1")).thenReturn(new FeedResponse(List.of(
+                new PostResponse("post-1", "user-1", "devuser", "mine", Instant.parse("2026-06-15T10:00:00Z"), 2, 0, true)
+        )));
+
+        mockMvc.perform(get("/api/posts/me")
+                        .with(authentication(authenticatedUser("user-1"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.posts.length()").value(1))
+                .andExpect(jsonPath("$.posts[0].id").value("post-1"))
+                .andExpect(jsonPath("$.posts[0].likedByMe").value(true));
+    }
+
+    @Test
+    void createPost_returnsBadRequestWhenContentBlank() throws Exception {
+        mockMvc.perform(post("/api/posts")
+                        .with(authentication(authenticatedUser("user-1")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"content\":\"   \"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value("Content is required"));
+    }
+
+    @Test
     void deleteOwnPost_returnsNoContent() throws Exception {
         mockMvc.perform(delete("/api/posts/post-1")
                         .with(authentication(authenticatedUser("user-1"))))

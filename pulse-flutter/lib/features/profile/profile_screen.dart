@@ -1,30 +1,45 @@
 import 'package:flutter/material.dart';
 
 import '../../core/di/app_scope.dart';
-import '../../core/widgets/pulse_components.dart';
 import '../../core/network/api_exception.dart';
+import '../../core/widgets/pulse_components.dart';
 import '../auth/auth_service.dart';
 import '../auth/login_screen.dart';
+import '../feed/data/post_response.dart';
+import '../feed/feed_service.dart';
+import '../feed/widgets/post_tile.dart';
+import '../like/like_service.dart';
 import '../user/data/user_api_repository.dart';
 import '../user/data/user_profile.dart';
 import '../user/user_service.dart';
 import 'edit_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key, this.userService, this.authService});
+  const ProfileScreen({
+    super.key,
+    this.userService,
+    this.authService,
+    this.feedService,
+    this.likeService,
+  });
 
   final UserService? userService;
   final AuthService? authService;
+  final FeedService? feedService;
+  final LikeService? likeService;
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  State<ProfileScreen> createState() => ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class ProfileScreenState extends State<ProfileScreen> {
   late final UserService _userService;
   late final AuthService _authService;
+  late final FeedService _feedService;
+  late final LikeService _likeService;
   bool _servicesResolved = false;
   UserProfile? _profile;
+  List<PostResponse> _posts = const [];
   bool _isLoading = true;
   String? _errorMessage;
 
@@ -38,57 +53,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final scope = AppScope.of(context);
     _userService = widget.userService ?? scope.userService;
     _authService = widget.authService ?? scope.authService;
-    _loadProfile();
+    _feedService = widget.feedService ?? scope.feedService;
+    _likeService = widget.likeService ?? scope.likeService;
+    reload();
   }
 
-  Future<void> _loadProfile() async {
+  /// Loads the profile and the user's own posts (US-08, US-09).
+  Future<void> reload() async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
-
     try {
       final profile = await _userService.loadProfile();
-      if (!mounted) {
-        return;
-      }
+      final posts = await _feedService.loadMyPosts();
+      if (!mounted) return;
       setState(() {
         _profile = profile;
+        _posts = posts;
         _isLoading = false;
       });
     } on StateError {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _errorMessage = 'Sign in to view your profile.';
-        _isLoading = false;
-      });
+      _setError('Sign in to view your profile.');
     } on UserApiException catch (error) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _errorMessage = error.message;
-        _isLoading = false;
-      });
+      _setError(error.message);
     } on ApiException catch (error) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _errorMessage = error.message;
-        _isLoading = false;
-      });
+      _setError(error.message);
     } catch (_) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _errorMessage = 'Could not load profile.';
-        _isLoading = false;
-      });
+      _setError('Could not load profile.');
     }
+  }
+
+  void _setError(String message) {
+    if (!mounted) return;
+    setState(() {
+      _errorMessage = message;
+      _isLoading = false;
+    });
   }
 
   Future<void> _openEditProfile() async {
@@ -120,6 +121,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
       MaterialPageRoute<void>(builder: (_) => const LoginScreen()),
       (_) => false,
     );
+  }
+
+  Future<void> _confirmAndDelete(PostResponse post) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete post?'),
+        content: const Text('This permanently removes your post.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    try {
+      await _feedService.deletePost(post.id);
+      await reload();
+    } on ApiException catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.message)));
+    }
   }
 
   @override
@@ -164,41 +194,87 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     final profile = _profile!;
-    final bio = profile.bio.trim().isEmpty
-        ? 'No bio yet. Tap edit to add one.'
-        : profile.bio;
-
     return RefreshIndicator(
-      onRefresh: _loadProfile,
+      onRefresh: reload,
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
         children: [
-          Row(
-            children: [
-              PulseAvatar(username: profile.username, radius: 36),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      profile.username,
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    ),
-                    Text(
-                      '@${profile.username}',
-                      style: Theme.of(context).textTheme.labelMedium,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Text(bio, style: Theme.of(context).textTheme.bodyLarge),
+          _ProfileHeader(profile: profile),
+          const SizedBox(height: 24),
+          ..._buildPosts(profile),
         ],
       ),
+    );
+  }
+
+  List<Widget> _buildPosts(UserProfile profile) {
+    if (_posts.isEmpty) {
+      return [
+        Padding(
+          padding: const EdgeInsets.only(top: 24),
+          child: Text(
+            'You have not posted yet.',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ),
+      ];
+    }
+    return _posts
+        .map(
+          (post) => Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: PostTile(
+              key: ValueKey(post.id),
+              post: post,
+              likeService: _likeService,
+              currentUserId: profile.id,
+              onDeleteRequested: _confirmAndDelete,
+            ),
+          ),
+        )
+        .toList();
+  }
+}
+
+class _ProfileHeader extends StatelessWidget {
+  const _ProfileHeader({required this.profile});
+
+  final UserProfile profile;
+
+  @override
+  Widget build(BuildContext context) {
+    final bio = profile.bio.trim().isEmpty
+        ? 'No bio yet. Tap edit to add one.'
+        : profile.bio;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            PulseAvatar(username: profile.username, radius: 36),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    profile.username,
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                  Text(
+                    '@${profile.username}',
+                    style: Theme.of(context).textTheme.labelMedium,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Text(bio, style: Theme.of(context).textTheme.bodyLarge),
+      ],
     );
   }
 }

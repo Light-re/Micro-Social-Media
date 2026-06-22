@@ -20,12 +20,19 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleValidation(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
-            errors.put(fieldError.getField(), fieldError.getDefaultMessage());
+            errors.putIfAbsent(fieldError.getField(), fieldError.getDefaultMessage());
         }
         ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         detail.setTitle("Validation failed");
+        detail.setDetail(firstMessage(errors));
         detail.setProperty("errors", errors);
         return detail;
+    }
+
+    private String firstMessage(Map<String, String> errors) {
+        return errors.values().stream()
+                .findFirst()
+                .orElse("Please check your input and try again.");
     }
 
     @ExceptionHandler(DuplicateResourceException.class)

@@ -12,6 +12,8 @@ class ComposeScreen extends StatefulWidget {
 }
 
 class _ComposeScreenState extends State<ComposeScreen> {
+  static const int _maxLength = 500;
+
   final TextEditingController _controller = TextEditingController();
   bool _isSubmitting = false;
 
@@ -54,6 +56,8 @@ class _ComposeScreenState extends State<ComposeScreen> {
           maxLines: null,
           expands: true,
           enabled: !_isSubmitting,
+          maxLength: _maxLength,
+          textAlignVertical: TextAlignVertical.top,
           onChanged: (_) => setState(() {}),
           style: Theme.of(context).textTheme.bodyLarge,
           decoration: const InputDecoration(
