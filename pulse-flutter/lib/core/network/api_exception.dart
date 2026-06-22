@@ -24,7 +24,7 @@ class ApiException implements Exception {
       400 || 409 => _extractMessage(body) ?? 'That request could not be processed.',
       401 => _extractMessage(body) ??
           'Your session has expired. Please sign in again.',
-      403 => 'You do not have permission to do that.',
+      403 => _extractMessage(body) ?? 'You do not have permission to do that.',
       404 => 'We could not find what you were looking for.',
       >= 500 => 'Something went wrong on our end. Please try again.',
       _ => _extractMessage(body) ?? 'Unexpected error. Please try again.',
