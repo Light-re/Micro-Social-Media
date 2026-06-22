@@ -24,7 +24,6 @@ jobs:
       flutter: ${{ steps.filter.outputs.flutter }}
       shared: ${{ steps.filter.outputs.shared }}
 
-      shared: ${{ steps.filter.outputs.shared }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -42,8 +41,8 @@ jobs:
             flutter:
               - 'pulse-flutter/**'
 
-              shared:
-                - '.github/workflows/**'
+            shared:
+              - '.github/workflows/**'
 
   backend:
     name: Backend — Compile, Test, Coverage, Architecture
