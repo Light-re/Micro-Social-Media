@@ -2,242 +2,139 @@ import 'package:flutter/material.dart';
 
 import '../../core/strings/app_strings.dart';
 import '../../core/theme/pulse_colors.dart';
-import '../auth/auth_service.dart';
-import '../like/like_service.dart';
-import 'data/post_response.dart';
-import 'feed_service.dart';
-import 'widgets/post_tile.dart';
+import '../../core/widgets/pulse_components.dart';
 
-class FeedScreen extends StatefulWidget {
-  const FeedScreen({super.key});
+class FeedPost {
+  const FeedPost({
+    required this.username,
+    required this.displayName,
+    required this.timestamp,
+    required this.text,
+    required this.likeCount,
+  });
 
-  @override
-  State<FeedScreen> createState() => FeedScreenState();
+  final String username;
+  final String displayName;
+  final String timestamp;
+  final String text;
+  final int likeCount;
 }
 
-class FeedScreenState extends State<FeedScreen> {
-  late FeedService _feedService;
-  late LikeService _likeService;
-  late AuthService _authService;
+const _demoPosts = [
+  FeedPost(
+    username: 'mira',
+    displayName: 'Mira',
+    timestamp: '2h ago',
+    text:
+        'The room went quiet and somehow that felt like everyone replying at once.',
+    likeCount: 12,
+  ),
+  FeedPost(
+    username: 'noah',
+    displayName: 'Noah',
+    timestamp: '18m ago',
+    text:
+        'Caught the tram home with rain on the glass. Small city, loud chest.',
+    likeCount: 8,
+  ),
+  FeedPost(
+    username: 'sana',
+    displayName: 'Sana',
+    timestamp: 'Just now',
+    text: 'Send me the songs that make the evening less rectangular.',
+    likeCount: 21,
+  ),
+];
 
-  bool _isLoading = true;
-  String? _error;
-  List<PostResponse> _posts = const [];
-  String? _currentUserId;
+class FeedScreen extends StatelessWidget {
+  const FeedScreen({
+    super.key,
+    this.posts = const [],
+  });
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final deps = AppScope.of(context);
-    _feedService = deps.feedService;
-    _likeService = deps.likeService;
-    _authService = deps.authService;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => reload());
-  }
-
-  /// Reloads the feed (US-29 loading, US-14/15 rendering, error retry).
-  Future<void> reload() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-    try {
-      final userId = await _authService.currentUserId();
-      final posts = await _feedService.loadFeed();
-      if (!mounted) return;
-      setState(() {
-        _currentUserId = userId;
-        _posts = posts;
-        _isLoading = false;
-      });
-    } on ApiException catch (error) {
-      if (!mounted) return;
-      setState(() {
-        _error = error.message;
-        _isLoading = false;
-      });
-    }
-  }
+  final List<FeedPost> posts;
 
   @override
   Widget build(BuildContext context) {
+    final effectivePosts = posts.isEmpty ? _demoPosts : posts;
+
     return Scaffold(
-      appBar: AppBar(title: const Text(AppStrings.feedTitle)),
-      body: posts.isEmpty
-          ? Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
+      backgroundColor: PulseColors.lightBackground,
+      appBar: AppBar(
+        title: const Text(AppStrings.feedTitle),
+        backgroundColor: PulseColors.lightBackground,
+        elevation: 0,
+      ),
+      body: ListView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        itemCount: effectivePosts.length,
+        itemBuilder: (context, index) {
+          final post = effectivePosts[index];
+
+          return Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 6,
+                  offset: Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header: Name + timestamp
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Icon(
-                      Icons.rss_feed,
-                      size: 64,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    const SizedBox(height: 20),
                     Text(
-                      AppStrings.feedEmptyMessage,
-                      style: Theme.of(context).textTheme.titleMedium,
-                      textAlign: TextAlign.center,
+                      post.displayName,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
-                    const SizedBox(height: 12),
                     Text(
-                      AppStrings.feedEmptySubtext,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                      textAlign: TextAlign.center,
+                      post.timestamp,
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 13,
+                      ),
                     ),
                   ],
                 ),
-              ),
-            )
-          : ListView.separated(
-              padding: const EdgeInsets.all(16),
-              itemCount: posts.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemBuilder: (context, index) {
-                final post = posts[index];
-                return Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      post,
-                      style: Theme.of(context).textTheme.bodyLarge,
+
+                const SizedBox(height: 8),
+
+                // Post text
+                Text(
+                  post.text,
+                  style: const TextStyle(fontSize: 15),
+                ),
+
+                const SizedBox(height: 12),
+
+                // Like row
+                Row(
+                  children: [
+                    const Icon(Icons.favorite_border, size: 20),
+                    const SizedBox(width: 6),
+                    Text(
+                      '${post.likeCount}',
+                      style: const TextStyle(fontSize: 14),
                     ),
-                  ),
-                );
-              },
-            ),
-      appBar: AppBar(
-        title: const Text('Pulse'),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(
-            height: 1,
-            color: PulseColors.coral.withValues(alpha: 0.35),
-          ),
-        ),
-      ),
-      body: RefreshIndicator(
-        color: PulseColors.coral,
-        onRefresh: reload,
-        child: _buildBody(),
-      ),
-    );
-  }
-
-  Widget _buildBody() {
-    if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (_error != null) {
-      return _ErrorState(message: _error!, onRetry: reload);
-    }
-    if (_posts.isEmpty) {
-      return const _NeutralState();
-    }
-    return ListView.separated(
-      physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-      itemCount: _posts.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 12),
-      itemBuilder: (context, index) {
-        final post = _posts[index];
-        return PostTile(
-          key: ValueKey(post.id),
-          post: post,
-          likeService: _likeService,
-          currentUserId: _currentUserId,
-          onDeleteRequested: _confirmAndDelete,
-        );
-      },
-    );
-  }
-
-  Future<void> _confirmAndDelete(PostResponse post) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete post?'),
-        content: const Text('This permanently removes your post.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true) return;
-    await _deletePost(post);
-  }
-
-  Future<void> _deletePost(PostResponse post) async {
-    try {
-      await _feedService.deletePost(post.id);
-      await reload();
-    } on ApiException catch (error) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(error.message)));
-    }
-  }
-}
-
-class _ErrorState extends StatelessWidget {
-  const _ErrorState({required this.message, required this.onRetry});
-
-  final String message;
-  final Future<void> Function() onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      children: [
-        const SizedBox(height: 120),
-        Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
-            child: Column(
-              children: [
-                Text(message, textAlign: TextAlign.center),
-                const SizedBox(height: 16),
-                FilledButton(onPressed: onRetry, child: const Text('Retry')),
+                  ],
+                ),
               ],
             ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _NeutralState extends StatelessWidget {
-  const _NeutralState();
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      children: [
-        const SizedBox(height: 140),
-        Center(
-          child: Text(
-            'Nothing here yet.',
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-        ),
-      ],
+          );
+        },
+      ),
     );
   }
 }
