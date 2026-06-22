@@ -1,10 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pulse/core/theme/pulse_theme.dart';
-import 'package:pulse/features/auth/auth_gate_screen.dart';
 import 'package:pulse/features/auth/data/session_record.dart';
 import 'package:pulse/features/home/home_shell.dart';
 import 'package:pulse/features/home/welcome_screen.dart';
+import 'package:pulse/main.dart';
 
 import '../../support/test_dependencies.dart';
 
@@ -13,13 +11,15 @@ Future<void> pumpAuthGate(
   SessionRecord? session,
 }) async {
   await tester.pumpWidget(
-    MaterialApp(
-      theme: PulseTheme.light(),
-      home: AuthGateScreen(
-        authService: buildTestDependencies(
-          (_) async => jsonResponse('{}'),
-          session: session,
-        ).authService,
+    PulseApp(
+      dependencies: buildTestDependencies(
+        (request) async {
+          if (request.url.path == '/api/posts/feed') {
+            return jsonResponse('{"posts":[]}');
+          }
+          return jsonResponse('{}');
+        },
+        session: session,
       ),
     ),
   );
