@@ -2,6 +2,8 @@ package com.frattoninteractive.pulse.comment;
 
 import com.frattoninteractive.pulse.comment.dto.CommentResponse;
 import com.frattoninteractive.pulse.comment.dto.CreateCommentRequest;
+import com.frattoninteractive.pulse.moderation.ContentModerationException;
+import com.frattoninteractive.pulse.moderation.ContentModerationService;
 import com.frattoninteractive.pulse.post.Post;
 import com.frattoninteractive.pulse.post.PostNotFoundException;
 import com.frattoninteractive.pulse.post.PostService;
@@ -26,6 +28,7 @@ class CommentServiceTest {
     private CommentRepository commentRepository;
     private PostService postService;
     private UserService userService;
+    private ContentModerationService moderationService;
     private CommentService commentService;
 
     @BeforeEach
@@ -33,7 +36,8 @@ class CommentServiceTest {
         commentRepository = mock(CommentRepository.class);
         postService = mock(PostService.class);
         userService = mock(UserService.class);
-        commentService = new CommentServiceImpl(commentRepository, postService, userService);
+        moderationService = mock(ContentModerationService.class);
+        commentService = new CommentServiceImpl(commentRepository, postService, userService, moderationService);
     }
 
     @Test
@@ -51,6 +55,7 @@ class CommentServiceTest {
         CommentResponse response = commentService.createComment(
                 "user-1", "post-1", new CreateCommentRequest("  Nice post  "));
 
+        verify(moderationService).moderateText("Nice post");
         assertThat(response.id()).isEqualTo("comment-1");
         assertThat(response.content()).isEqualTo("Nice post");
         assertThat(response.authorUsername()).isEqualTo("devuser");
@@ -83,6 +88,19 @@ class CommentServiceTest {
                 "user-1", "missing", new CreateCommentRequest("hi")))
                 .isInstanceOf(PostNotFoundException.class);
 
+        verify(commentRepository, never()).save(any());
+    }
+
+    @Test
+    void createComment_rejectsFlaggedContentBeforeLoadingPost() {
+        org.mockito.Mockito.doThrow(new ContentModerationException(List.of("violence")))
+                .when(moderationService).moderateText("blocked");
+
+        assertThatThrownBy(() -> commentService.createComment(
+                "user-1", "post-1", new CreateCommentRequest(" blocked ")))
+                .isInstanceOf(ContentModerationException.class);
+
+        verify(postService, never()).requirePost(any());
         verify(commentRepository, never()).save(any());
     }
 }

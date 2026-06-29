@@ -1,5 +1,7 @@
 package com.frattoninteractive.pulse.config;
 
+import com.frattoninteractive.pulse.moderation.ContentModerationException;
+import com.frattoninteractive.pulse.moderation.ModerationUnavailableException;
 import com.frattoninteractive.pulse.post.PostForbiddenException;
 import com.frattoninteractive.pulse.post.PostNotFoundException;
 import org.junit.jupiter.api.Test;
@@ -10,6 +12,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.Map;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -70,5 +73,26 @@ class GlobalExceptionHandlerTest {
 
         assertThat(detail.getStatus()).isEqualTo(403);
         assertThat(detail.getDetail()).contains("post-1");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void handleContentModeration_returnsRejectedProblem() {
+        ProblemDetail detail = handler.handleContentModeration(
+                new ContentModerationException(List.of("hate", "violence")));
+
+        assertThat(detail.getStatus()).isEqualTo(422);
+        assertThat(detail.getTitle()).isEqualTo("Content rejected");
+        assertThat((List<String>) detail.getProperties().get("categories"))
+                .containsExactly("hate", "violence");
+    }
+
+    @Test
+    void handleModerationUnavailable_returnsServiceUnavailableProblem() {
+        ProblemDetail detail = handler.handleModerationUnavailable(
+                new ModerationUnavailableException("Moderation service is currently unavailable.", null));
+
+        assertThat(detail.getStatus()).isEqualTo(503);
+        assertThat(detail.getTitle()).isEqualTo("Moderation unavailable");
     }
 }

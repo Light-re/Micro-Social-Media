@@ -28,6 +28,7 @@ Pulse ist eine mobile Social-Media-App. Der aktive Mobile-Client wird mit **Flut
 - Beiträge liken und unliken
 - Beiträge kommentieren
 - Eigene Beiträge löschen
+- Posts und Kommentare optional mit OpenAI Moderation prüfen
 - Lokaler Cache mit `sqflite` oder `drift`
 - Validierung von Eingaben
 - Ladezustände und Fehlermeldungen
@@ -39,6 +40,12 @@ Flutter App (Dart)
         |
         | REST API
         v
+Spring Boot Backend
+        |
+        | optionale Content Moderation
+        v
+OpenAI Moderation API
+
 Spring Boot Backend
         |
         v
@@ -148,6 +155,15 @@ notepad .env
 ```
 
 In `.env` muss ein eigener `JWT_SECRET` stehen. Die Datei `.env` darf nie committed werden.
+
+Optional kann für Content Moderation ein OpenAI API-Key gesetzt werden:
+
+```dotenv
+OPENAI_API_KEY=replace-with-your-openai-api-key
+OPENAI_MODERATION_ENABLED=true
+```
+
+Wenn `OPENAI_API_KEY` leer bleibt, speichert das Backend Posts und Kommentare ohne externe Moderationsprüfung. Mit API-Key prüft das Backend neue Posts und Kommentare vor dem Speichern mit `omni-moderation-latest`.
 
 ### Stack starten
 

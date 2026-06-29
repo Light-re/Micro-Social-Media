@@ -2,6 +2,8 @@ package com.frattoninteractive.pulse.config;
 
 import com.frattoninteractive.pulse.post.PostForbiddenException;
 import com.frattoninteractive.pulse.post.PostNotFoundException;
+import com.frattoninteractive.pulse.moderation.ContentModerationException;
+import com.frattoninteractive.pulse.moderation.ModerationUnavailableException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -63,6 +65,23 @@ public class GlobalExceptionHandler {
     public ProblemDetail handlePostForbidden(PostForbiddenException ex) {
         ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.FORBIDDEN);
         detail.setTitle("Forbidden");
+        detail.setDetail(ex.getMessage());
+        return detail;
+    }
+
+    @ExceptionHandler(ContentModerationException.class)
+    public ProblemDetail handleContentModeration(ContentModerationException ex) {
+        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_ENTITY);
+        detail.setTitle("Content rejected");
+        detail.setDetail("Your post or comment violates the content policy.");
+        detail.setProperty("categories", ex.getCategories());
+        return detail;
+    }
+
+    @ExceptionHandler(ModerationUnavailableException.class)
+    public ProblemDetail handleModerationUnavailable(ModerationUnavailableException ex) {
+        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.SERVICE_UNAVAILABLE);
+        detail.setTitle("Moderation unavailable");
         detail.setDetail(ex.getMessage());
         return detail;
     }

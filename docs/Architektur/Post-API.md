@@ -66,6 +66,8 @@ Flutter: `lib/features/feed/data/post_response.dart`
 | `401` | Kein gueltiges JWT |
 | `403` | Fremden Post loeschen |
 | `404` | Post existiert nicht |
+| `422` | Inhalt wurde von der Moderation abgelehnt |
+| `503` | Moderationsdienst ist nicht erreichbar |
 
 ## Architektur
 
@@ -74,6 +76,8 @@ PostController -> PostService -> PostRepository
                       |
                       v
                    UserService (Autor-Username)
+
+PostService -> ContentModerationService -> OpenAI Moderation API (optional)
 ```
 
 Likes und Kommentare werden in separaten User Stories ergaenzt.

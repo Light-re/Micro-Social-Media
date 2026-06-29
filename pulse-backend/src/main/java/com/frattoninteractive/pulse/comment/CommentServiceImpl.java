@@ -2,6 +2,7 @@ package com.frattoninteractive.pulse.comment;
 
 import com.frattoninteractive.pulse.comment.dto.CommentResponse;
 import com.frattoninteractive.pulse.comment.dto.CreateCommentRequest;
+import com.frattoninteractive.pulse.moderation.ContentModerationService;
 import com.frattoninteractive.pulse.post.Post;
 import com.frattoninteractive.pulse.post.PostService;
 import com.frattoninteractive.pulse.user.User;
@@ -19,9 +20,13 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final PostService postService;
     private final UserService userService;
+    private final ContentModerationService moderationService;
 
     @Override
     public CommentResponse createComment(String authorId, String postId, CreateCommentRequest request) {
+        String content = request.content().trim();
+        moderationService.moderateText(content);
+
         Post post = postService.requirePost(postId);
         User author = userService.findById(authorId);
 
@@ -29,7 +34,7 @@ public class CommentServiceImpl implements CommentService {
                 .postId(postId)
                 .authorId(authorId)
                 .authorUsername(author.getUsername())
-                .content(request.content().trim())
+                .content(content)
                 .createdAt(Instant.now())
                 .build());
 

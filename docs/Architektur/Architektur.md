@@ -61,6 +61,7 @@ Aufgaben:
 - Registrierung und Login verarbeiten
 - JWT erstellen und prüfen
 - Posts, Likes und Kommentare verwalten
+- Neue Posts und Kommentare vor dem Speichern ueber OpenAI Moderation pruefen, wenn ein API-Key konfiguriert ist
 - Daten in MongoDB speichern
 
 ## SQL und NoSQL

@@ -47,6 +47,8 @@ services:
     environment:
       SPRING_MONGODB_URI: mongodb://root:fratton2026@mongo:27017/pulse?authSource=admin
       JWT_SECRET: ${JWT_SECRET:-local-dev-jwt-secret-min-32-characters!!}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODERATION_ENABLED: ${OPENAI_MODERATION_ENABLED:-true}
     depends_on:
       mongo:
         condition: service_healthy
