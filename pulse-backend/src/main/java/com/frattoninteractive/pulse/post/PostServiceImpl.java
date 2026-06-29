@@ -2,6 +2,7 @@ package com.frattoninteractive.pulse.post;
 
 import com.frattoninteractive.pulse.like.Like;
 import com.frattoninteractive.pulse.like.LikeRepository;
+import com.frattoninteractive.pulse.moderation.ContentModerationService;
 import com.frattoninteractive.pulse.post.dto.CreatePostRequest;
 import com.frattoninteractive.pulse.post.dto.FeedResponse;
 import com.frattoninteractive.pulse.post.dto.PostResponse;
@@ -24,15 +25,19 @@ public class PostServiceImpl implements PostService {
     private final UserService userService;
     private final LikeRepository likeRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final ContentModerationService moderationService;
 
     @Override
     public PostResponse createPost(String authorId, CreatePostRequest request) {
+        String content = request.content().trim();
+        moderationService.moderateText(content);
+
         User author = userService.findById(authorId);
 
         Post post = Post.builder()
                 .authorId(authorId)
                 .authorUsername(author.getUsername())
-                .content(request.content().trim())
+                .content(content)
                 .createdAt(Instant.now())
                 .build();
 

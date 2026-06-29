@@ -2,6 +2,8 @@ package com.frattoninteractive.pulse.post;
 
 import com.frattoninteractive.pulse.like.Like;
 import com.frattoninteractive.pulse.like.LikeRepository;
+import com.frattoninteractive.pulse.moderation.ContentModerationException;
+import com.frattoninteractive.pulse.moderation.ContentModerationService;
 import com.frattoninteractive.pulse.post.dto.CreatePostRequest;
 import com.frattoninteractive.pulse.post.dto.FeedResponse;
 import com.frattoninteractive.pulse.post.dto.PostResponse;
@@ -31,6 +33,7 @@ class PostServiceTest {
     private UserService userService;
     private LikeRepository likeRepository;
     private ApplicationEventPublisher eventPublisher;
+    private ContentModerationService moderationService;
     private PostService postService;
 
     @BeforeEach
@@ -39,7 +42,8 @@ class PostServiceTest {
         userService = mock(UserService.class);
         likeRepository = mock(LikeRepository.class);
         eventPublisher = mock(ApplicationEventPublisher.class);
-        postService = new PostServiceImpl(postRepository, userService, likeRepository, eventPublisher);
+        moderationService = mock(ContentModerationService.class);
+        postService = new PostServiceImpl(postRepository, userService, likeRepository, eventPublisher, moderationService);
     }
 
     @Test
@@ -60,6 +64,7 @@ class PostServiceTest {
                 new CreatePostRequest("  Hello Pulse  ")
         );
 
+        verify(moderationService).moderateText("Hello Pulse");
         assertThat(response.id()).isEqualTo("post-1");
         assertThat(response.authorUsername()).isEqualTo("devuser");
         assertThat(response.content()).isEqualTo("Hello Pulse");
@@ -85,6 +90,19 @@ class PostServiceTest {
         verify(eventPublisher).publishEvent(captor.capture());
         assertThat(captor.getValue().post().id()).isEqualTo("post-1");
         assertThat(captor.getValue().post().content()).isEqualTo("Live!");
+    }
+
+    @Test
+    void createPost_rejectsFlaggedContentBeforeLoadingAuthor() {
+        org.mockito.Mockito.doThrow(new ContentModerationException(List.of("hate")))
+                .when(moderationService).moderateText("blocked");
+
+        assertThatThrownBy(() -> postService.createPost("user-1", new CreatePostRequest(" blocked ")))
+                .isInstanceOf(ContentModerationException.class);
+
+        verify(userService, never()).findById(any());
+        verify(postRepository, never()).save(any());
+        verify(eventPublisher, never()).publishEvent(any());
     }
 
     @Test
