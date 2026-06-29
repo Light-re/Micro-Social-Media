@@ -110,6 +110,17 @@ Der Feed zeigt Posts aller Benutzer in einer chronologischen Kartenansicht. Jede
 <img src="docs/Screenshots/Screenshot%202026-06-22%20115000.png" width="260" alt="Leere Kommentaransicht">
 <img src="docs/Screenshots/Screenshot%202026-06-22%20115037.png" width="260" alt="Kommentaransicht mit einem Kommentar">
 
+### Content Moderation
+
+Neue Posts werden im Backend vor dem Speichern über die OpenAI Moderation API geprüft, wenn ein API-Key konfiguriert ist. Harmloser Inhalt wird normal erstellt und erscheint danach direkt im Feed.
+
+<img src="docs/Screenshots/Screenshot%202026-06-29%20090303.png" width="260" alt="Neuer harmloser Post zum Testen der OpenAI Moderation">
+<img src="docs/Screenshots/Screenshot%202026-06-29%20090343.png" width="260" alt="Feed mit erfolgreich erstelltem Moderationstest-Post">
+
+Wenn der Moderationsdienst einen Inhalt als problematisch markiert, speichert das Backend den Post nicht und die App zeigt eine Fehlermeldung an.
+
+<img src="docs/Screenshots/Screenshot%202026-06-29%20090449.png" width="260" alt="Moderation blockiert einen problematischen Test-Post mit Fehlermeldung">
+
 ### Profil und Profilbearbeitung
 
 Im Profil sieht der angemeldete Benutzer seine Profildaten und die eigenen Posts. Der Screen enthält zusätzlich Aktionen zum Bearbeiten des Profils und zum Abmelden.
